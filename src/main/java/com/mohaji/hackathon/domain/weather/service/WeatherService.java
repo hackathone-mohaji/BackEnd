@@ -1,7 +1,7 @@
 package com.mohaji.hackathon.domain.weather.service;
 
-import com.mohaji.hackathon.domain.common.error.error.enums.ErrorCode;
-import com.mohaji.hackathon.domain.common.error.error.exception.BusinessException;
+import com.mohaji.hackathon.common.error.enums.ErrorCode;
+import com.mohaji.hackathon.common.error.exception.BusinessException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
