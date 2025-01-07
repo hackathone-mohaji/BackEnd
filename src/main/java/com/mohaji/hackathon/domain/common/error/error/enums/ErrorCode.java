@@ -81,8 +81,8 @@ public enum ErrorCode {
     LESSONNOTE_NOT_FOUND_OR_ALREADY_DELETED(400,"LN002","레슨노트를 찾을 수 없거나 이미 삭제된 노트입니다."),
     LESSONNOTE_NOT_UPDATED(400,"LN003","레슨 노트가 변경되지 않았습니다"),
 
-    //Record
-    RECORD_NOT_FOUND(400,"RD001","녹음 파일을 찾을 수 없습니다"),
+    //날씨정보
+    WEATHER_INFORMATION_NOT_FOUND(400,"WI001","날씨 정보를 찾을 수 없습니다."),
 
     //FCM 관련
     FAIL_TO_SEND_PUSH_NOTIFICATION(400,"F001","푸시알림 전송 요청을 실패했습니다");

@@ -35,7 +35,7 @@ out/
 
 application-database.yml
 application-secret.yml
-
+application-weather.yml
 
 ### VS Code ###
 .vscode/
