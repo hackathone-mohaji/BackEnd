@@ -19,20 +19,23 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Wear {
+public class Wear implements ImageEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
@@ -53,10 +56,12 @@ public class Wear {
   private Classification classification;
 
   /**
-   * 이미지
+   * 이미지 // 구현때문에 리스트 저장이고 실제로는 단일 이미지 저장
    * **/
-  @OneToOne
-  private Image image;
+  @OneToMany
+  @JoinTable
+  @Setter
+  private List<Image> images;
 
   //////////새부 속성/////////////
   /**
