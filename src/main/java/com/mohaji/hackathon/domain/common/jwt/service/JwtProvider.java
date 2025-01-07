@@ -2,8 +2,8 @@ package com.mohaji.hackathon.domain.common.jwt.service;
 
 
 
-import com.mohaji.hackathon.domain.auth.entity.Account;
-import com.mohaji.hackathon.domain.auth.repository.AccountRepository;
+import com.mohaji.hackathon.domain.entity.Account;
+import com.mohaji.hackathon.domain.repository.AccountRepository;
 import com.mohaji.hackathon.domain.common.error.error.enums.ErrorCode;
 import com.mohaji.hackathon.domain.common.error.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.common.jwt.config.JwtProperties;

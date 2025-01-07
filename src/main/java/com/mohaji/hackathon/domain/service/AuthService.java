@@ -1,12 +1,12 @@
-package com.mohaji.hackathon.domain.auth.service;
+package com.mohaji.hackathon.domain.service;
 
 
-import com.mohaji.hackathon.domain.auth.dto.FindRequestDTO;
-import com.mohaji.hackathon.domain.auth.dto.LoginRequestDTO;
-import com.mohaji.hackathon.domain.auth.dto.SignUpRequestDTO;
-import com.mohaji.hackathon.domain.auth.dto.SignUpResponseDTO;
-import com.mohaji.hackathon.domain.auth.entity.Account;
-import com.mohaji.hackathon.domain.auth.repository.AccountRepository;
+import com.mohaji.hackathon.domain.web.dto.FindRequestDTO;
+import com.mohaji.hackathon.domain.web.dto.LoginRequestDTO;
+import com.mohaji.hackathon.domain.web.dto.SignUpRequestDTO;
+import com.mohaji.hackathon.domain.web.dto.SignUpResponseDTO;
+import com.mohaji.hackathon.domain.entity.Account;
+import com.mohaji.hackathon.domain.repository.AccountRepository;
 import com.mohaji.hackathon.domain.common.error.error.enums.ErrorCode;
 import com.mohaji.hackathon.domain.common.error.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.common.jwt.dto.GeneratedTokenDTO;

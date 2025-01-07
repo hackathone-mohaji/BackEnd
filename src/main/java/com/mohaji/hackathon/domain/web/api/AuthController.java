@@ -1,13 +1,14 @@
-package com.mohaji.hackathon.domain.auth.controller;
+package com.mohaji.hackathon.domain.web.api;
 
 
 
-import com.mohaji.hackathon.domain.auth.dto.*;
-import com.mohaji.hackathon.domain.auth.service.AuthService;
+import com.mohaji.hackathon.domain.service.AuthService;
 import com.mohaji.hackathon.domain.common.error.error.exception.ErrorResponse;
 import com.mohaji.hackathon.domain.common.jwt.dto.GeneratedTokenDTO;
 import com.mohaji.hackathon.domain.common.jwt.service.JwtProvider;
-import io.jsonwebtoken.JwtException;
+import com.mohaji.hackathon.domain.web.dto.LoginRequestDTO;
+import com.mohaji.hackathon.domain.web.dto.SignUpRequestDTO;
+import com.mohaji.hackathon.domain.web.dto.SignUpResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,11 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequiredArgsConstructor

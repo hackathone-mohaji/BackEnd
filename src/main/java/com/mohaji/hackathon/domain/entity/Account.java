@@ -1,4 +1,4 @@
-package com.mohaji.hackathon.domain.auth.entity;
+package com.mohaji.hackathon.domain.entity;
 
 
 import jakarta.persistence.*;
@@ -12,10 +12,10 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "account")
 public class Account {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   private String email;

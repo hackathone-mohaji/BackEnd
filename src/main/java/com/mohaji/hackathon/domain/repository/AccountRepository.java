@@ -1,7 +1,7 @@
-package com.mohaji.hackathon.domain.auth.repository;
+package com.mohaji.hackathon.domain.repository;
 
 
-import com.mohaji.hackathon.domain.auth.entity.Account;
+import com.mohaji.hackathon.domain.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

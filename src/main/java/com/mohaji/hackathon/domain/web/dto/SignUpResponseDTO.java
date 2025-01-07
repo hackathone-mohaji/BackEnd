@@ -1,4 +1,4 @@
-package com.mohaji.hackathon.domain.auth.dto;
+package com.mohaji.hackathon.domain.web.dto;
 
 
 import lombok.AllArgsConstructor;
