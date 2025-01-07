@@ -6,6 +6,7 @@ spring:
     import:
       - classpath:application-secret.yml
       - classpath:application-database.yml
+      - classpath:application-weather.yml
 
 springdoc:
   swagger-ui:

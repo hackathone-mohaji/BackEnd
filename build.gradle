@@ -33,6 +33,10 @@ dependencies {
 	implementation 'org.postgresql:postgresql'
 	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
 	implementation 'org.glassfish.jaxb:jaxb-runtime:3.0.1'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// mac os 에서 네이티브 라이브러리 로드
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.98.Final:osx-aarch_64'
 
 	// validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -45,6 +49,9 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+	//Json
+	implementation 'org.json:json:20240303'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
 	//swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
