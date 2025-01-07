@@ -24,6 +24,8 @@ public class Account {
 
   private String username;
 
+  private String gender;
+
   @Setter
   private String refreshToken;
 
