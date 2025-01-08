@@ -198,7 +198,7 @@ public final class ImageUtil {
   }
 
   //실제 파일 저장
-  private  void saveFile(Object parentId, MultipartFile multipartFile, Image image)
+  private  void saveFile(UUID parentId, MultipartFile multipartFile, Image image)
       throws IOException {
 
     Path dirPath = Paths.get(ImageConfig.getImageDirectory(), image.getStoredFilePath());
