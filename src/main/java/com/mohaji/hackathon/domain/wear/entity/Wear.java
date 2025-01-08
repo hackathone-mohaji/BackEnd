@@ -12,16 +12,8 @@ import com.mohaji.hackathon.domain.wear.enums.Attributes.Neckline;
 import com.mohaji.hackathon.domain.wear.enums.Attributes.Print;
 import com.mohaji.hackathon.domain.wear.enums.Attributes.SleeveLength;
 import com.mohaji.hackathon.domain.wear.enums.Classification;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;

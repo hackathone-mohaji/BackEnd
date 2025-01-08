@@ -26,11 +26,15 @@ public class Combination {
   @ManyToOne
   private Wear wear;
 
-  /**
+/*
+  */
+/**
    * 스타일
-   * **/
+   * **//*
+
   @Enumerated(EnumType.STRING)
   private Style style;
+*/
 
 
 }

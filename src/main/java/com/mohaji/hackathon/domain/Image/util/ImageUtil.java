@@ -16,6 +16,8 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
@@ -25,7 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Component
 @RequiredArgsConstructor
-public final class ImageUtil {
+public  class ImageUtil {
 
 
   private final ImageRepository imageRepository;
@@ -37,6 +39,7 @@ public final class ImageUtil {
   /**
    * 이미지 추가 (이미지 리스트)// 수정로직에서 사용하면 기존에 존재하는 이미지를 삭제처리하고 추가
    **/
+  @Transactional
   public  <T extends ImageEntity> void addImage(
       T entity,
       List<MultipartFile> multipartFiles) throws IOException {
@@ -63,6 +66,7 @@ public final class ImageUtil {
  *  이미지 추가 (단일 이미지)// 수정로직에서 사용하면 기존에 존재하는 이미지를 논리적 삭제처리하고 추가
  **/
   //배경 지워짐
+@Transactional
   public  <T extends ImageEntity> void addImage(
       T entity,
       MultipartFile multipartFile) throws IOException {
@@ -100,6 +104,7 @@ public final class ImageUtil {
 
 
   //이미지  삭제시키는 메서드
+  //todo: 실제 이미지도 삭제되도록 해야함
   public  <T extends ImageEntity> void deleteImage(T entity) {
     if (entity != null) {
       imageRepository.deleteAll(entity.getImages());
@@ -115,11 +120,7 @@ public final class ImageUtil {
   // 이미지객체로 변환, db저장(이미지 리스트)
   private  List<Image> parseImageInfo(UUID parentId, List<MultipartFile> multipartFiles,
       ImageKind imageKind) throws IOException {
-    // delete files
-    List<Image> fileList = imageRepository.findByParentId(parentId);
-    if (fileList != null) {
-      imageRepository.deleteAll(fileList);
-    }
+
 
     // if empty, return null
     if (multipartFiles == null || multipartFiles.isEmpty()) {
@@ -151,11 +152,7 @@ public final class ImageUtil {
   // 이미지객체로 변환, db저장(단일 이미지)
   private Image parseImageInfo(UUID parentId, MultipartFile multipartFile,
       ImageKind imageKind) throws IOException {
-    // delete files
-    List<Image> fileList = imageRepository.findByParentId(parentId);
-    if (fileList != null) {
-      imageRepository.deleteAll(fileList);
-    }
+
 
     // if empty, return null
     if (multipartFile == null || multipartFile.isEmpty()) {
@@ -170,7 +167,6 @@ public final class ImageUtil {
         .kind(imageKind.getId())
         .originalFileName(multipartFile.getOriginalFilename())
         .storedFilePath(imageKind.getDirName())
-        //.fileContent(multipartFile.getBytes())// 의료데이터 관련 이미지 정책이 생기면 주석 해제
         .fileSize(multipartFile.getSize())
         .build();
     imageRepository.save(image);
