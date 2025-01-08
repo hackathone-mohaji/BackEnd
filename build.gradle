@@ -33,7 +33,9 @@ dependencies {
 	implementation 'org.postgresql:postgresql'
 	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
 	implementation 'org.glassfish.jaxb:jaxb-runtime:3.0.1'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	//api 호출
+	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
 
 	// mac os 에서 네이티브 라이브러리 로드
 	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.98.Final:osx-aarch_64'

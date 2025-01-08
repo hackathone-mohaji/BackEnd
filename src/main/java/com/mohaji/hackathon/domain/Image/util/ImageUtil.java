@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,19 +28,16 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public final class ImageUtil {
 
 
-  private static ImageRepository imageRepository;
+  private final ImageRepository imageRepository;
+  private final ClippingBgUtil clippingBgUtil;
 
-  @Autowired
-  public ImageUtil(ImageRepository imageRepository) {
-    ImageUtil.imageRepository = imageRepository;
 
-  }
 
 
   /**
    * 이미지 추가 (이미지 리스트)// 수정로직에서 사용하면 기존에 존재하는 이미지를 삭제처리하고 추가
    **/
-  public static <T extends ImageEntity> void addImage(
+  public  <T extends ImageEntity> void addImage(
       T entity,
       List<MultipartFile> multipartFiles) throws IOException {
     for (MultipartFile multipartFile : multipartFiles) {
@@ -65,8 +62,8 @@ public final class ImageUtil {
 /**
  *  이미지 추가 (단일 이미지)// 수정로직에서 사용하면 기존에 존재하는 이미지를 논리적 삭제처리하고 추가
  **/
-
-  public static <T extends ImageEntity> void addImage(
+  //배경 지워짐
+  public  <T extends ImageEntity> void addImage(
       T entity,
       MultipartFile multipartFile) throws IOException {
     validateImage(multipartFile);
@@ -92,7 +89,7 @@ public final class ImageUtil {
   // 이미지 조회 url 만들어서 반환하는 메서드
   // todo: 이미지는 항상 리스트임으로 삭제된 항목 제거후 조회하는 매서드 만들고 나서 리스트로 반환
   // fixme:  parentId와 filename이 같다면 잘못된 이미지 조회가 일어날 수 있다.// 이미지를 저장할때 parentId를 암호화 한다면 보안 + 이 문제가 해결된다
-  public static <T extends ImageEntity> String imageUrl(Image image, T entity) {
+  public  <T extends ImageEntity> String imageUrl(Image image, T entity) {
     String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
     String extension = StringUtils.getFilenameExtension(image.getOriginalFileName());
     String hashedFilename = hashFileName(
@@ -103,7 +100,7 @@ public final class ImageUtil {
 
 
   //이미지  삭제시키는 메서드
-  public static <T extends ImageEntity> void deleteImage(T entity) {
+  public  <T extends ImageEntity> void deleteImage(T entity) {
     if (entity != null) {
       imageRepository.deleteAll(entity.getImages());
     }
@@ -116,7 +113,7 @@ public final class ImageUtil {
 
 
   // 이미지객체로 변환, db저장(이미지 리스트)
-  private static List<Image> parseImageInfo(UUID parentId, List<MultipartFile> multipartFiles,
+  private  List<Image> parseImageInfo(UUID parentId, List<MultipartFile> multipartFiles,
       ImageKind imageKind) throws IOException {
     // delete files
     List<Image> fileList = imageRepository.findByParentId(parentId);
@@ -133,12 +130,14 @@ public final class ImageUtil {
     List<Image> newFileList = new ArrayList<>();
     for (MultipartFile multipartFile : multipartFiles) {
       if (!multipartFile.isEmpty()) {
+        //배경 제거
+        multipartFile = clippingBgUtil.removeBackground(multipartFile);
+
         Image image = Image.builder()
             .parentId(parentId)
             .kind(imageKind.getId())
             .originalFileName(multipartFile.getOriginalFilename())
             .storedFilePath(imageKind.getDirName())
-            //.fileContent(multipartFile.getBytes())// 의료데이터 관련 이미지 정책이 생기면 주석 해제
             .fileSize(multipartFile.getSize())
             .build();
         imageRepository.save(image);
@@ -150,7 +149,7 @@ public final class ImageUtil {
   }
 
   // 이미지객체로 변환, db저장(단일 이미지)
-  private static Image parseImageInfo(UUID parentId, MultipartFile multipartFile,
+  private Image parseImageInfo(UUID parentId, MultipartFile multipartFile,
       ImageKind imageKind) throws IOException {
     // delete files
     List<Image> fileList = imageRepository.findByParentId(parentId);
@@ -162,6 +161,8 @@ public final class ImageUtil {
     if (multipartFile == null || multipartFile.isEmpty()) {
       return new Image();
     }
+
+    multipartFile = clippingBgUtil.removeBackground(multipartFile);
 
     // new files
     Image image = Image.builder()
@@ -179,7 +180,7 @@ public final class ImageUtil {
   }
 
   //확장자 및 파일 크기 검사
-  private static void validateImage(MultipartFile multipartFile) throws IOException {
+  private  void validateImage(MultipartFile multipartFile) throws IOException {
     String extension = StringUtils.getFilenameExtension(multipartFile.getOriginalFilename());
     //확장자 검사
     if (extension == null || !ImageConfig.getAllowedExtensions()
@@ -197,7 +198,7 @@ public final class ImageUtil {
   }
 
   //실제 파일 저장
-  private static void saveFile(Object parentId, MultipartFile multipartFile, Image image)
+  private  void saveFile(Object parentId, MultipartFile multipartFile, Image image)
       throws IOException {
 
     Path dirPath = Paths.get(ImageConfig.getImageDirectory(), image.getStoredFilePath());
@@ -218,7 +219,7 @@ public final class ImageUtil {
   }
 
   // 해싱 메서드 (SHA-256 기반)
-  private static String hashFileName(String input) {
+  private  String hashFileName(String input) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
       byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));

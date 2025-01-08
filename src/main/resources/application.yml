@@ -7,9 +7,10 @@ spring:
       - classpath:application-secret.yml
       - classpath:application-database.yml
       - classpath:application-weather.yml
+      - classpath:application-removebg.yml
 
 image:
-  allowed-extensions: jpg,jpeg,png,gif,bmp
+  allowed-extensions: jpg,png
   max-file-size: 104857600 # 100MB in bytes
   directory: ${user.home}/n5v5w2l_image_storage
 
