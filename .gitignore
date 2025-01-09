@@ -33,9 +33,13 @@ out/
 /nbdist/
 /.nb-gradle/
 
+.DS_Store
+
+
 application-database.yml
 application-secret.yml
 application-weather.yml
+application-chatgpt.yml
 application-removebg.yml
 
 ### VS Code ###

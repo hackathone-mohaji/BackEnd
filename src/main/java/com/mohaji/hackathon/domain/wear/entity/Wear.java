@@ -19,6 +19,7 @@ import lombok.Setter;
 
 @Getter
 @Entity
+@Setter // todo 테스트 후 지우기
 @AllArgsConstructor
 @NoArgsConstructor
 public class Wear implements ImageEntity {

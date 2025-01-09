@@ -8,6 +8,7 @@ spring:
       - classpath:application-database.yml
       - classpath:application-weather.yml
       - classpath:application-removebg.yml
+      - classpath:application-chatgpt.yml
 
 image:
   allowed-extensions: jpg,png

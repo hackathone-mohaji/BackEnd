@@ -30,8 +30,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public  class ImageUtil {
 
 
-  private final ImageRepository imageRepository;
-  private final ClippingBgUtil clippingBgUtil;
+    private final ImageRepository imageRepository;
+    private final ClippingBgUtil clippingBgUtil;
 
 
 
@@ -46,19 +46,43 @@ public  class ImageUtil {
     for (MultipartFile multipartFile : multipartFiles) {
       validateImage(multipartFile);
     }
-    ImageKind imageKind = ImageKind.fromEntity(entity);
+    /**
+     *  이미지 추가 (단일 이미지)// 수정로직에서 사용하면 기존에 존재하는 이미지를 논리적 삭제처리하고 추가
+     **/
+    //배경 지워짐
+    public  <T extends ImageEntity> void addImage(
+            T entity,
+            MultipartFile multipartFile) throws IOException {
+        validateImage(multipartFile);
 
-    if (entity == null || entity.getId() == null) {
-      return;
+        ImageKind imageKind = ImageKind.fromEntity(entity);
+
+        if (entity == null || entity.getId() == null) {
+            return;
+        }
+
+        Image image = parseImageInfo(entity.getId(), multipartFile, imageKind);
+
+        if (entity.getImages() == null) {
+            entity.setImages(new ArrayList<>());
+        }
+        if (!multipartFile.isEmpty()) {
+            entity.getImages().add(image);
+        }
+
     }
 
-    List<Image> imageList = parseImageInfo(entity.getId(), multipartFiles, imageKind);
 
-    if (entity.getImages() == null) {
-      entity.setImages(new ArrayList<>());
-    }
-    if (!imageList.isEmpty()) {
-      entity.getImages().addAll(imageList);
+    // 이미지 조회 url 만들어서 반환하는 메서드
+    // todo: 이미지는 항상 리스트임으로 삭제된 항목 제거후 조회하는 매서드 만들고 나서 리스트로 반환
+    // fixme:  parentId와 filename이 같다면 잘못된 이미지 조회가 일어날 수 있다.// 이미지를 저장할때 parentId를 암호화 한다면 보안 + 이 문제가 해결된다
+    public  <T extends ImageEntity> String imageUrl(Image image, T entity) {
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String extension = StringUtils.getFilenameExtension(image.getOriginalFileName());
+        String hashedFilename = hashFileName(
+                image.getId().toString() + "_" + image.getParentId() + "_" + image.getOriginalFileName());
+        String newFilename = hashedFilename + (extension != null ? "." + extension : "");
+        return baseUrl + "/gen/" + ImageKind.fromEntity(entity).getDirName() + "/" + newFilename;
     }
 
   }
@@ -72,23 +96,69 @@ public  class ImageUtil {
       MultipartFile multipartFile) throws IOException {
     validateImage(multipartFile);
 
-    ImageKind imageKind = ImageKind.fromEntity(entity);
-
-    if (entity == null || entity.getId() == null) {
-      return;
+    //이미지  삭제시키는 메서드
+    //todo: 실제 이미지도 삭제되도록 해야함
+    public  <T extends ImageEntity> void deleteImage(T entity) {
+        if (entity != null) {
+            imageRepository.deleteAll(entity.getImages());
+        }
     }
 
-    Image image = parseImageInfo(entity.getId(), multipartFile, imageKind);
 
-    if (entity.getImages() == null) {
-      entity.setImages(new ArrayList<>());
+
+
+    /*----------------------private 매서드-------------------------*/
+
+
+    // 이미지객체로 변환, db저장(이미지 리스트)
+    private  List<Image> parseImageInfo(UUID parentId, List<MultipartFile> multipartFiles,
+                                        ImageKind imageKind) throws IOException {
+        // delete files
+        List<Image> fileList = imageRepository.findByParentId(parentId);
+        if (fileList != null) {
+            imageRepository.deleteAll(fileList);
+        }
+
+        // if empty, return null
+        if (multipartFiles == null || multipartFiles.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // new files
+        List<Image> newFileList = new ArrayList<>();
+        for (MultipartFile multipartFile : multipartFiles) {
+            if (!multipartFile.isEmpty()) {
+                //배경 제거
+                multipartFile = clippingBgUtil.removeBackground(multipartFile);
+
+                Image image = Image.builder()
+                        .parentId(parentId)
+                        .kind(imageKind.getId())
+                        .originalFileName(multipartFile.getOriginalFilename())
+                        .storedFilePath(imageKind.getDirName())
+                        .fileSize(multipartFile.getSize())
+                        .build();
+                imageRepository.save(image);
+                newFileList.add(image);
+                saveFile(parentId, multipartFile, image);
+            }
+        }
+        return newFileList;
     }
-    if (!multipartFile.isEmpty()) {
-      entity.getImages().add(image);
-    }
 
-  }
+    // 이미지객체로 변환, db저장(단일 이미지)
+    private Image parseImageInfo(UUID parentId, MultipartFile multipartFile,
+                                 ImageKind imageKind) throws IOException {
+        // delete files
+        List<Image> fileList = imageRepository.findByParentId(parentId);
+        if (fileList != null) {
+            imageRepository.deleteAll(fileList);
+        }
 
+        // if empty, return null
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            return new Image();
+        }
 
   // 이미지 조회 url 만들어서 반환하는 메서드
   // todo: 이미지는 항상 리스트임으로 삭제된 항목 제거후 조회하는 매서드 만들고 나서 리스트로 반환
@@ -134,20 +204,17 @@ public  class ImageUtil {
         //배경 제거
         multipartFile = clippingBgUtil.removeBackground(multipartFile);
 
+        // new files
         Image image = Image.builder()
-            .parentId(parentId)
-            .kind(imageKind.getId())
-            .originalFileName(multipartFile.getOriginalFilename())
-            .storedFilePath(imageKind.getDirName())
-            .fileSize(multipartFile.getSize())
-            .build();
+                .parentId(parentId)
+                .kind(imageKind.getId())
+                .originalFileName(multipartFile.getOriginalFilename())
+                .storedFilePath(imageKind.getDirName())
+                //.fileContent(multipartFile.getBytes())// 의료데이터 관련 이미지 정책이 생기면 주석 해제
+                .fileSize(multipartFile.getSize())
+                .build();
         imageRepository.save(image);
-        newFileList.add(image);
         saveFile(parentId, multipartFile, image);
-      }
-    }
-    return newFileList;
-  }
 
   // 이미지객체로 변환, db저장(단일 이미지)
   private Image parseImageInfo(UUID parentId, MultipartFile multipartFile,
@@ -225,12 +292,6 @@ public  class ImageUtil {
         if (hex.length() == 1) {
           hexString.append('0');
         }
-        hexString.append(hex);
-      }
-      return hexString.toString();
-    } catch (Exception e) {
-      throw new RuntimeException("Error hashing file name", e);
     }
-  }
 
 }
