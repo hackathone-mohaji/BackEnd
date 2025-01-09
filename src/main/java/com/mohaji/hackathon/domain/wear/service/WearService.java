@@ -71,7 +71,7 @@ public class WearService {
     public void saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
         try {
             // 1. GPT에서 분석 결과 받기
-            WearDTO wearDto = gptService.processResponse(gptService.analyzeImage(imageFile));
+            WearDTO wearDto = gptService.analyzeImage(imageFile);
             log.info("Mapped WearDTO: {}", wearDto);
 
             // 2. Wear 엔티티 생성

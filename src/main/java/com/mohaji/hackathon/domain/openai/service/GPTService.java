@@ -200,32 +200,32 @@ public class GPTService {
 
 
 
-    public WearDTO processResponse(String response) {
-        try {
-            // 1. 원본 응답을 JsonNode로 파싱
-            JsonNode rootNode = objectMapper.readTree(response.toString());
-            log.info("RootNode: {}", rootNode.toString());
+//    public WearDTO processResponse(String response) {
+//        try {
+//            // 1. 원본 응답을 JsonNode로 파싱
+//            JsonNode rootNode = objectMapper.readTree(response.toString());
+//            log.info("RootNode: {}", rootNode.toString());
+//
+//// 2. content 값 추출
+//            String content = rootNode
+//                    .get("choices")
+//                    .get(0)
+//                    .get("message")
+//                    .get("content")
+//                    .asText();
+//            log.info("Extracted content: {}", content);
+//
+//// 3. content 값을 JSON으로 바로 파싱하여 DTO로 매핑
+//            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
+//            log.info("Mapped WearDTO: {}", wearDto);
+//
+//            return wearDto;
+//        } catch (Exception e) {
+//            throw new RuntimeException("JSON 데이터 처리 중 오류 발생", e);
+//        }
+//    }
 
-// 2. content 값 추출
-            String content = rootNode
-                    .get("choices")
-                    .get(0)
-                    .get("message")
-                    .get("content")
-                    .asText();
-            log.info("Extracted content: {}", content);
-
-// 3. content 값을 JSON으로 바로 파싱하여 DTO로 매핑
-            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
-            log.info("Mapped WearDTO: {}", wearDto);
-
-            return wearDto;
-        } catch (Exception e) {
-            throw new RuntimeException("JSON 데이터 처리 중 오류 발생", e);
-        }
-    }
-
-    public String analyzeImage(MultipartFile image) throws IOException {
+    public WearDTO analyzeImage(MultipartFile image) throws IOException {
         // 프롬프트 및 요청 구성은 기존 코드 유지
         String prompt = "Based on the provided image, please determine the values corresponding to each category and organize them into a JSON format. **Ensure that the JSON format is valid and properly structured.Please provide the JSON content without the enclosing json\\n at the beginning, \\n at the end, and also remove all newline characters (\\n) along with extra spaces and whitespace. The results should be written according to the following categories: \n" +
                 "\n" +
@@ -261,7 +261,27 @@ public class GPTService {
                 .retrieve()
                 .body(String.class);
 
-        // 2. content만 추출하고 JSON 파싱
-        return processResponse(response).toString(); // 결과 WearDTO를 반환
+        try {
+            // 1. 원본 응답을 JsonNode로 파싱
+            JsonNode rootNode = objectMapper.readTree(response.toString());
+            log.info("RootNode: {}", rootNode.toString());
+
+// 2. content 값 추출
+            String content = rootNode
+                    .get("choices")
+                    .get(0)
+                    .get("message")
+                    .get("content")
+                    .asText();
+            log.info("Extracted content: {}", content);
+
+// 3. content 값을 JSON으로 바로 파싱하여 DTO로 매핑
+            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
+            log.info("Mapped WearDTO: {}", wearDto);
+
+            return wearDto;
+        } catch (Exception e) {
+            throw new RuntimeException("JSON 데이터 처리 중 오류 발생", e);
+        }
     }
 }

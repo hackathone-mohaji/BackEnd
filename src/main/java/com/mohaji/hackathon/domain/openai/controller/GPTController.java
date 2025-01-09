@@ -31,9 +31,9 @@ public class GPTController {
     }
 
     @PostMapping(value = "/image_upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> analyzeImage(@RequestPart MultipartFile image) throws IOException {
+    public ResponseEntity<WearDTO> analyzeImage(@RequestPart MultipartFile image) throws IOException {
 
-        String response = gptService.analyzeImage(image);
+        WearDTO response = gptService.analyzeImage(image);
         return ResponseEntity.ok(response);
     }
 
