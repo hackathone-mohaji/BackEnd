@@ -118,7 +118,7 @@ public  class ImageUtil {
 
 
     // 이미지객체로 변환, db저장(이미지 리스트)
-    private  List<Image> parseImageInfo(Long parentId, List<MultipartFile> multipartFiles,
+    private  List<Image> parseImageInfo(UUID parentId, List<MultipartFile> multipartFiles,
                                         ImageKind imageKind) throws IOException {
 
 
@@ -131,9 +131,6 @@ public  class ImageUtil {
         List<Image> newFileList = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             if (!multipartFile.isEmpty()) {
-                //배경 제거
-                multipartFile = clippingBgUtil.removeBackground(multipartFile);
-
                 Image image = Image.builder()
                         .parentId(parentId)
                         .kind(imageKind.getId())
@@ -150,7 +147,7 @@ public  class ImageUtil {
     }
 
     // 이미지객체로 변환, db저장(단일 이미지)
-    private Image parseImageInfo(Long parentId, MultipartFile multipartFile,
+    private Image parseImageInfo(UUID parentId, MultipartFile multipartFile,
                                  ImageKind imageKind) throws IOException {
 
 
@@ -158,8 +155,6 @@ public  class ImageUtil {
         if (multipartFile == null || multipartFile.isEmpty()) {
             return new Image();
         }
-
-        multipartFile = clippingBgUtil.removeBackground(multipartFile);
 
         // new files
         Image image = Image.builder()
@@ -194,7 +189,7 @@ public  class ImageUtil {
     }
 
     //실제 파일 저장
-    private  void saveFile(Long parentId, MultipartFile multipartFile, Image image)
+    private  void saveFile(UUID parentId, MultipartFile multipartFile, Image image)
             throws IOException {
 
         Path dirPath = Paths.get(ImageConfig.getImageDirectory(), image.getStoredFilePath());
