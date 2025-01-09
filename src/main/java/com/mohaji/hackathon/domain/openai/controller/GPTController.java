@@ -3,6 +3,7 @@ package com.mohaji.hackathon.domain.openai.controller;
 import com.mohaji.hackathon.domain.openai.dto.ChatRequestDTO;
 import com.mohaji.hackathon.domain.openai.service.FineTuneExample;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
+import com.mohaji.hackathon.domain.wear.dto.WearDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,8 @@
 package com.mohaji.hackathon.domain.wear.service;
 
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,19 +36,20 @@ public class WearService {
     private final ObjectMapper objectMapper;
 
 
-    //    public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
+//        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
 //        try {
 //            // 1. 이미지 누끼 땀
-//            MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
+////            MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
 //            // 2. gpt 한테 분석
-//            String json = gptService.analyzeImage(removeBackground);
+//            String json = gptService.analyzeImage(imageFile);
 //
 //            // 3. 분석 결과 (wear) 저장
+//            log.info("Json"+json);
 //
 //            ObjectMapper objectMapper = new ObjectMapper();
 //            JsonNode rootNode = objectMapper.readTree(json);
 //            String content = rootNode.get("choices").get(0).get("message").get("content").asText();
-//            content = content.replaceAll("```json", "").replaceAll("```", "").trim();
+//
 //
 //            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
 //            System.out.println("wearDto = " + wearDto);
@@ -65,57 +68,28 @@ public class WearService {
 //        }
 //    }
 
+    public void saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
+        try {
+            // 1. GPT에서 분석 결과 받기
+            WearDTO wearDto = gptService.processResponse(gptService.analyzeImage(imageFile));
+            log.info("Mapped WearDTO: {}", wearDto);
 
+            // 2. Wear 엔티티 생성
+            Wear wear = Wear.builder()
+                    .color(wearDto.getColor())
+                    .category(wearDto.getCategory())
+                    .item(wearDto.getItem())
+                    .prints(wearDto.getPrint())
+                    .build();
 
-    public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
-//        try {
-        // 1. 이미지 배경 제거
-//        MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
-
-        // 2. GPT에서 분석 결과 받기
-        String json = gptService.analyzeImage(imageFile);
-
-        log.info("Received JSON from GPT: {}", json); // 디버깅을 위한 로그 추가
-
-        // 2. content 필드 내부 JSON 추출
-        String regex = "```json\\n\\{.*?\\}\\n```";
-        Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(json);
-
-        String extractedContent;
-        if (matcher.find()) {
-            extractedContent = matcher.group();
-            // "```json\n"와 "\n```" 제거
-            extractedContent = extractedContent.replaceAll("```json\\n|\\n```", "");
-            log.info("Extracted Content: {}", extractedContent); // 디버깅을 위한 로그 추가
-        } else {
-            log.error("No valid JSON content found in the response");
-            throw new RuntimeException("Failed to extract JSON content from GPT response");
+            // 3. Wear 엔티티 저장 및 반환
+             wearRepository.save(wear);
+        } catch (Exception e) {
+            log.error("Error while mapping JSON to WearDTO", e);
+            throw new RuntimeException("JSON 데이터 매핑 실패", e);
         }
-
-        // 3. JSON 파싱 및 WearDTO로 변환
-        WearDTO wearDto = objectMapper.readValue(extractedContent, WearDTO.class);
-        log.info("Parsed WearDTO: {}", wearDto);
-
-        // 4. Wear 엔티티 생성
-        Wear wear = Wear.builder()
-                .color(wearDto.getColor())
-                .category(wearDto.getCategory())
-                .item(wearDto.getItem())
-                .prints(wearDto.getPrint())
-                .build();
-
-        // 5. 엔티티 저장 및 반환
-        return wearRepository.save(wear);
-
-//        } catch (IOException e) {
-//            log.error("이미지 처리 중 오류 발생", e);
-//            throw new RuntimeException("이미지 처리 중 오류 발생", e);
-//        } catch (Exception e) {
-//            log.error("데이터 처리 중 오류 발생", e);
-//            throw new RuntimeException("데이터 처리 중 오류 발생", e);
-//        }
     }
+
 }
 
 

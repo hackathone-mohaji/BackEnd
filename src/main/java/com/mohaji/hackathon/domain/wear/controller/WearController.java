@@ -19,7 +19,7 @@ public class WearController {
     private final WearService wearService;
 
     @PostMapping(value = "/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Wear createWear(@RequestPart MultipartFile file) throws IOException {
-        return wearService.saveImageAndAnalyzeDate(file);
+    public void createWear(@RequestPart MultipartFile file) throws IOException {
+         wearService.saveImageAndAnalyzeDate(file);
     }
 }
