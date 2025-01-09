@@ -118,7 +118,7 @@ public  class ImageUtil {
 
 
     // 이미지객체로 변환, db저장(이미지 리스트)
-    private  List<Image> parseImageInfo(UUID parentId, List<MultipartFile> multipartFiles,
+    private  List<Image> parseImageInfo(Long parentId, List<MultipartFile> multipartFiles,
                                         ImageKind imageKind) throws IOException {
 
 
@@ -147,7 +147,7 @@ public  class ImageUtil {
     }
 
     // 이미지객체로 변환, db저장(단일 이미지)
-    private Image parseImageInfo(UUID parentId, MultipartFile multipartFile,
+    private Image parseImageInfo(Long parentId, MultipartFile multipartFile,
                                  ImageKind imageKind) throws IOException {
 
 
@@ -189,7 +189,7 @@ public  class ImageUtil {
     }
 
     //실제 파일 저장
-    private  void saveFile(UUID parentId, MultipartFile multipartFile, Image image)
+    private  void saveFile(Long parentId, MultipartFile multipartFile, Image image)
             throws IOException {
 
         Path dirPath = Paths.get(ImageConfig.getImageDirectory(), image.getStoredFilePath());
