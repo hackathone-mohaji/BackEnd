@@ -1,3 +1,4 @@
+/*
 package com.mohaji.hackathon.domain.wear.enums.Attributes;
 
 import lombok.AllArgsConstructor;
@@ -14,3 +15,4 @@ public enum Length {
   private final String englishName;
 
 }
+*/

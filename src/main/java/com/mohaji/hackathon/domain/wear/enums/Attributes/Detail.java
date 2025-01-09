@@ -1,3 +1,4 @@
+/*
 package com.mohaji.hackathon.domain.wear.enums.Attributes;
 
 import lombok.AllArgsConstructor;
@@ -51,3 +52,4 @@ public enum Detail {
   private final String koreanName;
   private final String englishName;
 }
+*/
