@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 public class WeatherController {
@@ -15,7 +17,7 @@ public class WeatherController {
 
 
     @GetMapping("/weather")
-    public String getWeather(
+    public Map<String, Object> getWeather(
 
             @RequestParam int nx,
             @RequestParam int ny) {
