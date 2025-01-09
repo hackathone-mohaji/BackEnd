@@ -11,7 +11,7 @@ import com.mohaji.hackathon.domain.wear.enums.Attributes.Matter;
 import com.mohaji.hackathon.domain.wear.enums.Attributes.Neckline;
 import com.mohaji.hackathon.domain.wear.enums.Attributes.Print;
 import com.mohaji.hackathon.domain.wear.enums.Attributes.SleeveLength;
-import com.mohaji.hackathon.domain.wear.enums.Classification;
+import com.mohaji.hackathon.domain.wear.enums.Attributes.Classification;
 import jakarta.persistence.*;
 
 import java.util.List;

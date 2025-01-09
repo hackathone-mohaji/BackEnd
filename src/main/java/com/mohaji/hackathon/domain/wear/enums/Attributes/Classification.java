@@ -1,4 +1,4 @@
-package com.mohaji.hackathon.domain.wear.enums;
+package com.mohaji.hackathon.domain.wear.enums.Attributes;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
