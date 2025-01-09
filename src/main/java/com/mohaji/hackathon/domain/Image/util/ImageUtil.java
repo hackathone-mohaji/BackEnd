@@ -66,8 +66,8 @@ public  class ImageUtil {
      *  이미지 추가 (단일 이미지)// 수정로직에서 사용하면 기존에 존재하는 이미지를 논리적 삭제처리하고 추가
      **/
     //배경 지워짐
-    @Transactional
-    public  <T extends ImageEntity> void addImage(
+
+    public  <T extends ImageEntity> void addImage (
             T entity,
             MultipartFile multipartFile) throws IOException {
         validateImage(multipartFile);

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.mohaji.hackathon.domain.Image.util.ClippingBgUtil;
+import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.wear.dto.CompletionResponseDTO;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
 import com.mohaji.hackathon.domain.wear.entity.Wear;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,6 +36,7 @@ public class WearService {
     private final GPTService gptService;
     private final ClippingBgUtil clippingBgUtil;
     private final ObjectMapper objectMapper;
+    private final ImageUtil imageUtil;
 
 
 //        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
@@ -68,13 +71,19 @@ public class WearService {
 //        }
 //    }
 
+    @Transactional
     public void saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
         try {
-            // 1. GPT에서 분석 결과 받기
-            WearDTO wearDto = gptService.analyzeImage(imageFile);
+
+
+            //todo 이미지 누끼 주석 풀기
+            // 1. 이미지 누끼 땀
+            MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
+            // 2. GPT에서 분석 결과 받기
+            WearDTO wearDto = gptService.analyzeImage(removeBackground);
             log.info("Mapped WearDTO: {}", wearDto);
 
-            // 2. Wear 엔티티 생성
+            // 3. Wear 엔티티 생성
             Wear wear = Wear.builder()
                     .color(wearDto.getColor())
                     .category(wearDto.getCategory())
@@ -82,8 +91,12 @@ public class WearService {
                     .prints(wearDto.getPrint())
                     .build();
 
-            // 3. Wear 엔티티 저장 및 반환
+            // 4. Wear 엔티티 저장 및 반환
              wearRepository.save(wear);
+
+            // 5. 이미지 저장
+            imageUtil.addImage(wear, removeBackground);
+
         } catch (Exception e) {
             log.error("Error while mapping JSON to WearDTO", e);
             throw new RuntimeException("JSON 데이터 매핑 실패", e);
