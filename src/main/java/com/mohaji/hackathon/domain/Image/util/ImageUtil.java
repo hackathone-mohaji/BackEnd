@@ -131,9 +131,6 @@ public  class ImageUtil {
     List<Image> newFileList = new ArrayList<>();
     for (MultipartFile multipartFile : multipartFiles) {
       if (!multipartFile.isEmpty()) {
-        //배경 제거
-        multipartFile = clippingBgUtil.removeBackground(multipartFile);
-
         Image image = Image.builder()
             .parentId(parentId)
             .kind(imageKind.getId())
@@ -158,8 +155,6 @@ public  class ImageUtil {
     if (multipartFile == null || multipartFile.isEmpty()) {
       return new Image();
     }
-
-    multipartFile = clippingBgUtil.removeBackground(multipartFile);
 
     // new files
     Image image = Image.builder()
