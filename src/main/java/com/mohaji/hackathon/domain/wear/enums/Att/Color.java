@@ -3,6 +3,9 @@ package com.mohaji.hackathon.domain.wear.enums.Att;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @AllArgsConstructor
 @Getter
 public enum Color {
@@ -34,4 +37,10 @@ public enum Color {
   WINE("와인");
 
   private final String koreanName;
+
+  public static String toFormattedString() {
+    return Stream.of(Color.values())
+            .map(Enum::name)
+            .collect(Collectors.joining(", "));
+  }
 }

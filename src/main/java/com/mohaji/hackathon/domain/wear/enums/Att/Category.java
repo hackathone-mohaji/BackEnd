@@ -3,6 +3,9 @@ package com.mohaji.hackathon.domain.wear.enums.Att;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @AllArgsConstructor
 @Getter
 public enum Category {
@@ -17,5 +20,10 @@ public enum Category {
 
   private final String koreanName;
 
+  public static String toFormattedString() {
+    return Stream.of(Category.values())
+            .map(Enum::name)
+            .collect(Collectors.joining(", "));
+  }
 
 }

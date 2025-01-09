@@ -3,6 +3,9 @@ package com.mohaji.hackathon.domain.wear.enums.Att;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @AllArgsConstructor
 @Getter
 public enum Item {
@@ -57,4 +60,9 @@ public enum Item {
   SLEEVELESS("슬리브리스");
 
   private final String koreanName;
+  public static String toFormattedString() {
+    return Stream.of(Item.values())
+            .map(Enum::name)
+            .collect(Collectors.joining(", "));
+  }
 }
