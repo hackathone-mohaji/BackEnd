@@ -162,30 +162,19 @@ public class GPTService {
 //                .body(String.class);
 //    }
     public String analyzeImage(MultipartFile image) throws IOException {
-        String prompt = "\"아래 제공된 사진을 기반으로 각 분류에 해당하는 값을 판단하여 JSON 형태로 정리해 주세요. 특히 색깔을 신경써서 확인해주세요 분류는 다음과 같이 나뉩니다:\n" +
+        String prompt = "Based on the provided image, please determine the values corresponding to each category and organize them into a JSON format. **Ensure that the JSON format is valid and properly structured.** Pay special attention to the color classification.Get rid of all the blanks and entertainment and give me one line. The results should be written according to the following categories: \n" +
                 "\n" +
-                "1. **카테고리 분류**:  \n" +
+                "1. **Category **:  \n" +
                 "`TOP`, `COAT`, `JACKET`, `PANTS`, `SKIRT`, `DRESS`, `JUMPER`, `JUMPSUIT`\n" +
                 "\n" +
-                "2. **색깔 분류**:  \n" +
+                "2. **Color **:  \n" +
                 "`BURGUNDY`, `CAMEL`, `NAVY`, `BROWN`, `GRAY`, `DEEP_TONE`, `BLUE`, `WHITE`, `SKY_BLUE`, `MONOTONE`, `PURPLE`, `BEIGE`, `PINK`, `CREAM`, `SILVER`, `GOLD`, `BLACK`, `KHAKI`, `GREEN`, `DARK_TONE`, `GRAYISH_TONE`, `YELLOW`, `VIVID_TONE`, `ORANGE`, `RED`, `WINE`\n" +
                 "\n" +
-                "3. **아이템 분류**:  \n" +
+                "3. **Item **:  \n" +
                 "`CHANEL_JACKET`, `TRENCH_COAT`, `SHIRT`, `OVERSIZED_T_SHIRT`, `SHIRT_DRESS`, `CARDIGAN`, `BLAZER`, `POLO_SHIRT`, `CABLE_KNIT`, `V_NECK_SWEATER`, `DUFFLE_COAT`, `TENNIS_SKIRT`, `CHESTERFIELD_COAT`, `BOX_COAT`, `VEST`, `SLACKS`, `PINTUCK_PANTS`, `LOOSE_FIT_PANTS`, `STRAIGHT_PANTS`, `SKINNY_PANTS`, `CARGO_PANTS`, `MILITARY_JACKET`, `T_SHIRT`, `JEANS`, `HOODIE`, `OVERALLS`, `LONG_DRESS`, `LONG_SKIRT`, `ASYMMETRIC_DRESS`, `BLOUSE`, `LOOSE_FIT_BLOUSE`, `FLARE_SKIRT`, `MERMAID_DRESS`, `H_LINE_SKIRT`, `PENCIL_SKIRT`, `DRAPE_DRESS`, `TIGHT_DRESS`, `DRAPE_JACKET`, `PONCHO`, `ROBE`, `CAPE`, `STAND_COLLAR_JACKET`, `CHINA_COLLAR_JACKET`, `OVERSIZED_JACKET`, `NO_COLLAR_JACKET`, `LEATHER_JACKET`, `HAREM_PANTS`, `CHEMISE_DRESS`, `SLEEVELESS`\n" +
                 "\n" +
-                "4. **프린트 분류**:  \n" +
-                "`CHECK`, `HERRINGBONE`, `STRIPE`, `SOLID`, `HOUNDSTOOTH`, `GEOMETRIC`, `ANIMAL`, `FLORAL`, `TIE_DYE`, `LEOPARD`, `ZEBRA`, `OP_ART`, `CAMOUFLAGE`, `ABSTRACT`, `CUBISM`\n" +
-                "\n" +
-                "결과는 아래 예시처럼 JSON 형태로 작성해 주세요:\n" +
-                "\n" +
-                "```json\n" +
-                "{" +
-                "  \\\"category\\\": \\\"JACKET\\\",\n" +
-                "  \\\"color\\\": \\\"NAVY\\\",\n" +
-                "  \\\"item\\\": \\\"BLAZER\\\",\n" +
-                "  \\\"print\\\": \\\"SOLID\\\"\n" +
-                "}";
-
+                "4. **Print **:  \n" +
+                "`CHECK`, `HERRINGBONE`, `STRIPE`, `SOLID`, `HOUNDSTOOTH`, `GEOMETRIC`, `ANIMAL`, `FLORAL`, `TIE_DYE`, `LEOPARD`, `ZEBRA`, `OP_ART`, `CAMOUFLAGE`, `ABSTRACT`, `CUBISM`\n";
         // 이미지 파일을 Base64로 인코딩
         byte[] fileBytes = image.getBytes();
         String base64Image = Base64.getEncoder().encodeToString(fileBytes);

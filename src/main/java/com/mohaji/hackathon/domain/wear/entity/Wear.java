@@ -11,15 +11,13 @@ import jakarta.persistence.*;
 
 import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 
 
 @Getter
 @Entity
-@Setter // todo 테스트 후 지우기
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Wear implements ImageEntity {
