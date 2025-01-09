@@ -1,12 +1,10 @@
-package com.mohaji.hackathon.common.jwt.dto;
+package com.mohaji.hackathon.common.security.dto;
 
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.UUID;
 
 @Getter
 @Builder

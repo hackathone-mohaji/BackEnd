@@ -16,12 +16,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Optional<Account> findByEmail(String email);
 
-    @Modifying
-    @Query("UPDATE Account m SET m.refreshToken = null WHERE m.id = :memberId")
-    void invalidateRefreshToken(@Param("memberId") Long memberId);
 
-
-    @Modifying
-    @Query("UPDATE Account m SET m.refreshToken = :refreshToken WHERE m.id = :id")
-    void updateRefreshToken(@Param("id") Long id, @Param("refreshToken") String refreshToken);
 }

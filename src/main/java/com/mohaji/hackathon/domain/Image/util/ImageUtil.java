@@ -31,7 +31,7 @@ public  class ImageUtil {
 
 
     private final ImageRepository imageRepository;
-    private final ClippingBgUtil clippingBgUtil;
+
 
 
 

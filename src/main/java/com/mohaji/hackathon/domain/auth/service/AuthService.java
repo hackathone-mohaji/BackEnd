@@ -1,6 +1,7 @@
 package com.mohaji.hackathon.domain.auth.service;
 
 
+import com.mohaji.hackathon.common.security.dto.SecurityMemberDTO;
 import com.mohaji.hackathon.domain.auth.dto.FindRequestDTO;
 import com.mohaji.hackathon.domain.auth.dto.LoginRequestDTO;
 import com.mohaji.hackathon.domain.auth.dto.SignUpRequestDTO;
@@ -9,17 +10,24 @@ import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.auth.repository.AccountRepository;
 import com.mohaji.hackathon.common.error.enums.ErrorCode;
 import com.mohaji.hackathon.common.error.exception.BusinessException;
-import com.mohaji.hackathon.common.jwt.dto.GeneratedTokenDTO;
-import com.mohaji.hackathon.common.jwt.dto.SecurityMemberDTO;
-import com.mohaji.hackathon.common.jwt.provider.JwtProvider;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +35,10 @@ import java.util.UUID;
 public class AuthService {
 
     private final AccountRepository accountRepository;
-    private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
-
+    private final AuthenticationManager authenticationManager;
+    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+    private final HttpSessionSecurityContextRepository securityContextRepository;
 
     @Transactional
     public SignUpResponseDTO signUp(SignUpRequestDTO signUpRequestDTO) {
@@ -53,8 +62,24 @@ public class AuthService {
                 .build();
     }
 
-    @Transactional
-    public GeneratedTokenDTO login(LoginRequestDTO loginRequestDTO) {
+    public void login(LoginRequestDTO loginRequestDTO, HttpServletRequest req, HttpServletResponse res) {
+        try {
+            UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken(
+                    loginRequestDTO.getEmail(),
+                    loginRequestDTO.getPassword()
+                );
+
+            Authentication authentication = authenticationManager.authenticate(token);
+            SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
+            context.setAuthentication(authentication);
+            securityContextRepository.saveContext(context, req, res);
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("로그인 인증에 실패했습니다");
+        }
+    }
+ /*   @Transactional
+    public void login(LoginRequestDTO loginRequestDTO) {
         Optional<Account> findEmail = accountRepository.findByEmail(loginRequestDTO.getEmail());
 
         if (findEmail.isPresent()) {
@@ -66,7 +91,7 @@ public class AuthService {
                         .username(account.getUsername())
                         .build();
 
-                return jwtProvider.generateTokens(securityMemberDTO);
+
             } else {
                 throw new BusinessException(ErrorCode.INVALID_PASSWORD);
             }
@@ -74,7 +99,7 @@ public class AuthService {
         } else {
             throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
         }
-    }
+    }*/
 
     @Transactional
     public boolean duplicateEmail(String requsetEmail) {

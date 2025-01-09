@@ -2,10 +2,9 @@ package com.mohaji.hackathon.domain.auth.controller;
 
 
 
+import com.mohaji.hackathon.common.security.CustomUserDetailService;
 import com.mohaji.hackathon.domain.auth.service.AuthService;
 import com.mohaji.hackathon.common.error.exception.ErrorResponse;
-import com.mohaji.hackathon.common.jwt.dto.GeneratedTokenDTO;
-import com.mohaji.hackathon.common.jwt.provider.JwtProvider;
 import com.mohaji.hackathon.domain.auth.dto.LoginRequestDTO;
 import com.mohaji.hackathon.domain.auth.dto.SignUpRequestDTO;
 import com.mohaji.hackathon.domain.auth.dto.SignUpResponseDTO;
@@ -13,20 +12,24 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.netty.http.server.HttpServerRequest;
+import reactor.netty.http.server.HttpServerResponse;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
     private final AuthService authService;
-    private final JwtProvider jwtProvider;
 
-    @PostMapping("/signup")
+
+  @PostMapping("/signup")
     @Operation(summary = "회원가입 로직", description = "이메일, 이름, 전화번호, 닉네임, 비밀번호를 입력하면 검증 후 회원가입을 진행합니다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "성공"),
@@ -46,10 +49,11 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "유효하지 않은 입력값입니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "400", description = "토큰 관련 오류들.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             })
-    public ResponseEntity<GeneratedTokenDTO> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO,
+        HttpServletRequest req, HttpServletResponse res) {
 
-        GeneratedTokenDTO generatedTokenDTO = authService.login(loginRequestDTO);
-        return ResponseEntity.ok(generatedTokenDTO);
+      authService.login(loginRequestDTO,req,res);
+        return ResponseEntity.ok("ok");
 
     }
 
