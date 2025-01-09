@@ -1,60 +1,77 @@
 package com.mohaji.hackathon.domain.wear.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class CompletionResponseDTO {
+
     private String id;
     private String object;
-    private long created;
+    private Long created;
     private String model;
-    private Choice[] choices;
+    private List<Choice> choices;
     private Usage usage;
+    private String systemFingerprint;
 
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
     public static class Choice {
-        private int index;
+        private Integer index;
         private Message message;
-        private String refusal;
-
-        @Data
+        private Object logprobs;
+        private String finishReason;
+        @Getter
+        @Setter
+        @NoArgsConstructor
         public static class Message {
             private String role;
             private String content;
+            private String refusal;
         }
     }
-
-    @Data
+    @Getter
+    @Setter
+    @NoArgsConstructor
     public static class Usage {
-        @JsonProperty("prompt_tokens")
-        private int promptTokens;
+        private Integer promptTokens;
 
-        @JsonProperty("completion_tokens")
-        private int completionTokens;
+        private Integer completionTokens;
 
-        @JsonProperty("total_tokens")
-        private int totalTokens;
+        private Integer totalTokens;
 
-        @JsonProperty("prompt_tokens_details")
-        private TokenDetails promptTokensDetails;
+        private PromptTokenDetails promptTokensDetails;
 
-        @JsonProperty("completion_tokens_details")
-        private TokenDetails completionTokensDetails;
+        private CompletionTokenDetails completionTokensDetails;
 
-        @Data
-        public static class TokenDetails {
-            @JsonProperty("cached_tokens")
-            private int cachedTokens;
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        public static class PromptTokenDetails {
+            private Integer cachedTokens;
 
-            @JsonProperty("audio_tokens")
-            private int audioTokens;
+            private Integer audioTokens;
+        }
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        public static class CompletionTokenDetails {
 
-            @JsonProperty("accepted_prediction_tokens")
-            private int acceptedPredictionTokens;
+            private Integer reasoningTokens;
 
-            @JsonProperty("rejected_prediction_tokens")
-            private int rejectedPredictionTokens;
+            private Integer audioTokens;
+
+            private Integer acceptedPredictionTokens;
+
+            private Integer rejectedPredictionTokens;
         }
     }
 }

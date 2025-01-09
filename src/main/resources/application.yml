@@ -9,7 +9,10 @@ spring:
       - classpath:application-weather.yml
       - classpath:application-removebg.yml
       - classpath:application-chatgpt.yml
-
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 image:
   allowed-extensions: jpg,png
   max-file-size: 104857600 # 100MB in bytes
