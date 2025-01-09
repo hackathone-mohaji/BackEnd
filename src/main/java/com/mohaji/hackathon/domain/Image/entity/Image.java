@@ -19,12 +19,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Image {
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
 
 
-  private UUID parentId;
+  private Long parentId;
 
   private int kind;
 

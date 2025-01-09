@@ -1,5 +1,6 @@
 package com.mohaji.hackathon.domain.openai.service;
 
+import com.mohaji.hackathon.domain.openai.config.GptConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -17,10 +18,10 @@ public class GPTFineTuneService {
 
 
 
-    public GPTFineTuneService(WebClient.Builder builder, @Value("${openai.secret-key}") String secretKey) {
+    public GPTFineTuneService(WebClient.Builder builder, GptConfig gptConfig) {
         this.restClient = builder
                 .baseUrl("https://api.openai.com/v1")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + secretKey) // Bearer와 키 사이에 공백 필요
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + gptConfig.getSecretKey()) // Bearer와 키 사이에 공백 필요
                 .build();
     }
 

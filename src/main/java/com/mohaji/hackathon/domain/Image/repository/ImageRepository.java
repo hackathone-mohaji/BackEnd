@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ImageRepository extends JpaRepository<Image , UUID> {
+public interface ImageRepository extends JpaRepository<Image , Long> {
 
     Optional<Image> findByStoredFilePathLike(String path);
-    List<Image> findByParentId(UUID id);
+    List<Image> findByParentId(Long id);
 }

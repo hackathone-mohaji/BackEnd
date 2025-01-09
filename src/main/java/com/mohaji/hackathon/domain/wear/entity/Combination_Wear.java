@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 public class Combination_Wear {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
 
   @ManyToOne

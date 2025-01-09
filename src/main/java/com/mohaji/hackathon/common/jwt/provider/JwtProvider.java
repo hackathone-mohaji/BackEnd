@@ -117,7 +117,7 @@ public class JwtProvider {
         }
     }
 
-    private void saveRefreshToken(UUID id, String refreshToken) {
+    private void saveRefreshToken(Long id, String refreshToken) {
         Optional<Account> findMember = accountRepository.findById(id);
         findMember.ifPresent(member -> accountRepository.updateRefreshToken(member.getId(), refreshToken));
     }

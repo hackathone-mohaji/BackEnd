@@ -12,12 +12,12 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 public class SecurityMemberDTO {
-    private final UUID id;
+    private final Long id;
     @Setter
     private final String email;
     private final String username;
 
     public static SecurityMemberDTO fromClaims(Claims claims) {
-        return SecurityMemberDTO.builder().id(UUID.fromString(claims.getId())).email(claims.get("email", String.class)).username(claims.get("name", String.class)).build();
+        return SecurityMemberDTO.builder().id(Long.parseLong(claims.getId())).email(claims.get("email", String.class)).username(claims.get("name", String.class)).build();
     }
 }

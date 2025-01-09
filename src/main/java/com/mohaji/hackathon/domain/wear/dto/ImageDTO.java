@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageDTO {
-    private UUID id;
+    private Long id;
     private String originalFileName;
     private String url; // 이미지 URL
 }

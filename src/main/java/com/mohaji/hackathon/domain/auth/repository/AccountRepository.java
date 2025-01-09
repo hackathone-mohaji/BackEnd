@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, UUID> {
+public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Optional<Account> findByEmail(String email);
 
@@ -23,5 +23,5 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     @Modifying
     @Query("UPDATE Account m SET m.refreshToken = :refreshToken WHERE m.id = :id")
-    void updateRefreshToken(@Param("id") UUID id, @Param("refreshToken") String refreshToken);
+    void updateRefreshToken(@Param("id") Long id, @Param("refreshToken") String refreshToken);
 }

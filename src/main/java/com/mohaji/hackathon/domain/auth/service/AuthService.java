@@ -40,7 +40,6 @@ public class AuthService {
 
         String hashedPassword = passwordEncoder.encode(signUpRequestDTO.getPassword());
         Account account = Account.builder()
-                .id(UUID.randomUUID())
                 .username(signUpRequestDTO.getName())
                 .email(signUpRequestDTO.getEmail())
                 .password(hashedPassword)

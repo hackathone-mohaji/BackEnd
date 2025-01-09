@@ -1,5 +1,6 @@
 package com.mohaji.hackathon.domain.openai.service;
 
+import com.mohaji.hackathon.domain.openai.config.GptConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,13 +13,12 @@ public class OpenAIModelService {
 
     private final RestClient restClient;
 
-    @Value("${openai.secret-key}")
-    private String secretKey;
 
-    public OpenAIModelService(RestClient.Builder builder) {
+
+    public OpenAIModelService(RestClient.Builder builder, GptConfig gptConfig) {
         this.restClient = builder
                 .baseUrl("https://api.openai.com/v1")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + secretKey)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + gptConfig.getSecretKey())
                 .build();
     }
 

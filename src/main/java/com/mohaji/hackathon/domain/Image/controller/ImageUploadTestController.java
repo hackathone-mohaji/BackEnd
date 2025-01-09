@@ -25,7 +25,8 @@ public class ImageUploadTestController {
     private final ImageUtil imageUtil;
     private final WearRepository wearRepository;
 
-    private static final UUID wearId = UUID.fromString("3e21b7c1-51f8-4bd8-80d6-5bfa22c4728b");
+//    private static final UUID wearId = UUID.fromString("3e21b7c1-51f8-4bd8-80d6-5bfa22c4728b");
+    private static final Long wearId = Long.valueOf(1);
 
     /**
      * 이미지 리스트 추가 API

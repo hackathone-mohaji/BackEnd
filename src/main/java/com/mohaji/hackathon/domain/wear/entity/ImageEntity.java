@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ImageEntity {
-    UUID getId();
+    Long getId();
     List<Image> getImages();
     void setImages(List<Image> images);
 
