@@ -1,8 +1,8 @@
 package com.mohaji.hackathon.domain.wear.controller;
 
 
-
 import com.mohaji.hackathon.domain.wear.dto.GPTRecommendationResponseDTO;
+import com.mohaji.hackathon.domain.wear.dto.SwipeDto;
 import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto.WearResponseDto;
 import com.mohaji.hackathon.domain.wear.service.OutfitRecommendationService;
 import com.mohaji.hackathon.domain.wear.service.WearService;
@@ -23,15 +23,15 @@ import java.io.IOException;
 @RequestMapping("/wear")
 public class WearController {
 
-    private final WearService wearService;
+  private final WearService wearService;
   private final OutfitRecommendationService outfitRecommendationService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "개별 옷 이미지 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
-    @Secured("ROLE_USER")
-    public void createWear(@RequestPart MultipartFile file) throws IOException {
-         wearService.saveImageAndAnalyzeDate(file);
-    }
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(summary = "개별 옷 이미지 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
+  @Secured("ROLE_USER")
+  public void createWear(@RequestPart MultipartFile file) throws IOException {
+    wearService.saveImageAndAnalyzeDate(file);
+  }
 
   @DeleteMapping("/{wearId}")
   @Secured("ROLE_USER")
@@ -43,18 +43,20 @@ public class WearController {
   @GetMapping
   @Secured("ROLE_USER")
   @Operation(summary = "로그인한 사용자의 이미지를 반환함, 쿼리 파라미터로 category를 넘기면 필터링됨")
-  public ResponseEntity<List<WearResponseDto>> listWearImage(@RequestParam(required = false) String category) {
+  public ResponseEntity<List<WearResponseDto>> listWearImage(
+      @RequestParam(required = false) String category) {
 
     List<WearResponseDto> wearResponseDtos = wearService.listWearImage(category);
 
     return ResponseEntity.ok(wearResponseDtos);
   }
 
-  @GetMapping("/recommend")
+  @PatchMapping
   @Secured("ROLE_USER")
-  @Operation(summary = "바뀔거니깐 쓰지 마셈")
-  public GPTRecommendationResponseDTO recommendWearFromGPT(){
-    return outfitRecommendationService.recommendOutfit();
+  @Operation(summary = "조합반환")
+  public ResponseEntity<SwipeDto> swipe() {
+
+    return ResponseEntity.ok(wearService.swipe());
   }
 }
 

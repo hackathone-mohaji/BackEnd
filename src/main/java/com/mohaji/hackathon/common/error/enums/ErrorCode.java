@@ -55,6 +55,8 @@ public enum ErrorCode {
     TOO_FREQUENT_POST(400, "P004", "게시글을 작성한 지 얼마 지나지 않았으므로 잠시 후 작성해주세요"),
     WEAR_NULL(404, "P005", "옷 없음"),
     NOT_WEAR_OWN(409, "P006", "옷의 소유자가 아닙니다."),
+    COMBINATION_NULL(409, "P007", "조합이 없습니다. 충분한 옷을 등록해 주세요"),
+    COMBINATION_NON(500, "P008", "조합이 없습니다."),
 
 
     // Multipart

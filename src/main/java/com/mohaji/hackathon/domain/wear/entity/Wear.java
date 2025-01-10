@@ -32,13 +32,6 @@ public class Wear implements ImageEntity {
   @ManyToOne
   private Account account;
 
-  /**
-   * 상하의 구분
-   * **/
-/*
-  @Enumerated(EnumType.STRING)
-  private Classification classification;
-*/
 
   /**
    * 이미지 // 구현때문에 리스트 저장이고 실제로는 단일 이미지 저장

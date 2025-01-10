@@ -1,5 +1,6 @@
 package com.mohaji.hackathon.domain.wear.entity;
 
+import com.mohaji.hackathon.domain.auth.entity.Account;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,4 +27,7 @@ public class CombinationWear {
 
   @ManyToOne
   Wear wear;
+
+  @ManyToOne
+  private Account account;
 }

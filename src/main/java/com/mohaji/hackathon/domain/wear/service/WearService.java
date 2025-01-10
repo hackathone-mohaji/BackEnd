@@ -1,18 +1,20 @@
 package com.mohaji.hackathon.domain.wear.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.mohaji.hackathon.common.error.enums.ErrorCode;
 import com.mohaji.hackathon.common.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.Image.util.ClippingBgUtil;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
+import com.mohaji.hackathon.domain.wear.dto.SwipeDto;
+import com.mohaji.hackathon.domain.wear.dto.SwipeDto.wearDto;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
-import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto;
 import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto.WearResponseDto;
+import com.mohaji.hackathon.domain.wear.entity.Combination;
+import com.mohaji.hackathon.domain.wear.entity.CombinationWear;
 import com.mohaji.hackathon.domain.wear.entity.Wear;
 import com.mohaji.hackathon.domain.wear.enums.Att.Category;
+import com.mohaji.hackathon.domain.wear.repository.CombinationRepository;
 import com.mohaji.hackathon.domain.wear.repository.CombinationWearRepository;
 import com.mohaji.hackathon.domain.wear.repository.WearRepository;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
@@ -37,6 +39,8 @@ public class WearService {
   private final ClippingBgUtil clippingBgUtil;
   private final ImageUtil imageUtil;
   private final CombinationWearRepository CombinationWearRepository;
+  private final CombinationWearRepository combinationWearRepository;
+  private final CombinationRepository combinationRepository;
 
 //        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
 //        try {
@@ -147,6 +151,59 @@ public class WearService {
             imageUtil.imageUrl(wear.getImages().get(0), wear))).toList();
 
 
+  }
+
+  public SwipeDto swipe() {
+    //로그인된 계정조회
+    Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    // 자신의 옷 조합 중 DB에 미리 저장된 옷 조합에서 랜덤으로 하나 가져오기
+    Combination combination = combinationRepository.findRandomByAccountId(
+        account.getId());
+    if (combination == null) {
+      throw new BusinessException(ErrorCode.COMBINATION_NULL);
+    }
+
+    combination.setViewed(true);
+
+    //자신의 전체 옷 조합중 viewed가 true 인 것 수 a
+    long viewedCount = combinationRepository.countByAccountIdAndViewed(account.getId(), true);
+
+    //자신의 전체 옷 조합중 viewed false 인 것 수 b
+    long unviewedCount = combinationRepository.countByAccountIdAndViewed(account.getId(), false);
+
+    // a+b가 짝수일때 b-a 가 0 이거나 a+b가 홀수 일때 b-a 가 1 이라면 animation 키워드 반환
+    long totalCount = viewedCount + unviewedCount;
+    long difference = unviewedCount - viewedCount;
+    List<Wear> wears = combinationWearRepository.findAllByCombinationId(combination.getId()).stream()
+        .map(
+            CombinationWear::getWear).toList();
+    List<SwipeDto.wearDto> wearDtos = wears.stream()
+        .map(wear -> new SwipeDto.wearDto(wear, imageUtil.imageUrl(wear.getImages().get(0), wear))).toList();
+    SwipeDto swipeDto = SwipeDto.builder()
+        .wears(wearDtos)
+        .reason(combination.getReason())
+        .bookmarked(combination.bookmarked)
+        .combinationId(combination.getId())
+        .build();
+
+    if (totalCount % 2 == 0 && difference == 0) {
+      swipeDto.setAnimation(true);
+    } else if (totalCount % 2 != 0 && difference == 1) {
+      swipeDto.setAnimation(true);
+    }
+
+    // b-a 가 음수라면 gpt api를 통해 새로운 옷 조합 10개 생성 후 저장
+    if (difference < 0) {
+      //todo : gpt 한테 옷 조합 10개 추천 받고 db에 저장
+      //outfitRecommendationService.recommendOutfit();
+    }
+
+    // 옷 조합 반환
+
+
+    return swipeDto;
   }
 
 }

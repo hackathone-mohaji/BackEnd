@@ -8,9 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,12 +33,15 @@ public class Combination {
   @Enumerated(EnumType.STRING)
   private Style style;
 
-  private boolean viewed;
+  public boolean viewed;
 
-  private boolean bookmarked;
+  public boolean bookmarked;
 
   @ManyToOne
   private Account account;
+
+
+  private String  reason;
 
 
 }

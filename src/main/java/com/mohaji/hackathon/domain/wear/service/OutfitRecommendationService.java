@@ -6,7 +6,6 @@ import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
 import com.mohaji.hackathon.domain.wear.dto.GPTRecommendationResponseDTO;
-import com.mohaji.hackathon.domain.wear.dto.OutfitRecommendationDTO;
 import com.mohaji.hackathon.domain.wear.entity.Wear;
 import com.mohaji.hackathon.domain.wear.repository.WearRepository;
 import com.mohaji.hackathon.domain.weather.dto.WeatherInfoDTO;
@@ -14,11 +13,8 @@ import com.mohaji.hackathon.domain.weather.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
