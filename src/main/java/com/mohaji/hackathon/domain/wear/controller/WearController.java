@@ -9,6 +9,7 @@ import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto.WearResponseDto;
 import com.mohaji.hackathon.domain.wear.entity.Combination;
 import com.mohaji.hackathon.domain.wear.service.BookmarkService;
 import com.mohaji.hackathon.domain.wear.service.OutfitRecommendationService;
+import com.mohaji.hackathon.domain.wear.service.TenService;
 import com.mohaji.hackathon.domain.wear.service.WearService;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -32,6 +33,7 @@ public class WearController {
   private final WearService wearService;
   private final OutfitRecommendationService outfitRecommendationService;
   private final BookmarkService bookmarkService;
+  private final TenService tenService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "개별 옷 이미지 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
@@ -90,6 +92,11 @@ public class WearController {
     @GetMapping("/test")
     public GPTRecommendationResponseDTO test(){
         return outfitRecommendationService.recommendOutfit();
+    }
+
+    @GetMapping("/test22222")
+    public GPTRecommendationResponseDTO test2(){
+        return tenService.TenrecommendOutfit();
     }
 }
 

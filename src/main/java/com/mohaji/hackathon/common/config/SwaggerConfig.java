@@ -51,11 +51,7 @@ public class SwaggerConfig {
                         .version("v0.0.1")
                         .contact(new io.swagger.v3.oas.models.info.Contact()
                                 .name("VoQal")
-                                .url("https://github.com/hackathone-mohaji/BackEnd")))
-                .servers(List.of(
-                        new io.swagger.v3.oas.models.servers.Server().url("http://182.214.198.108:8888").description("Local HTTP server")
-
-                ));
+                                .url("https://github.com/hackathone-mohaji/BackEnd")));
     }
 
     @Bean

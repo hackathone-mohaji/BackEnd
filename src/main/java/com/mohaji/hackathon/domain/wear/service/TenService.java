@@ -24,7 +24,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OutfitRecommendationService {
+public class TenService {
+
     private final WeatherService weatherService;
     private final WearRepository wearRepository;
     private final GPTService gptService;
@@ -32,7 +33,7 @@ public class OutfitRecommendationService {
     private final CombinationRepository combinationRepository;
     private final CombinationWearRepository combinationWearRepository;
 
-    public GPTRecommendationResponseDTO recommendOutfit() {
+    public GPTRecommendationResponseDTO TenrecommendOutfit() {
         // 1. 회원 정보 불러오기
         Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -49,7 +50,7 @@ public class OutfitRecommendationService {
         String gptResponse = gptService.getRecommendationFromGPT(prompt);
 
         // 6. 응답 값 가공 후 리턴
-        return (GPTRecommendationResponseDTO) parseGPTResponse(gptResponse, userWears, account);
+        return (GPTRecommendationResponseDTO) parseGPTResponses(gptResponse, userWears, account);
 
         // 7. 이미지 url 까지 첨부해서 json 작성
     }
@@ -150,9 +151,9 @@ public class OutfitRecommendationService {
         prompt.append("- If there are multiple colors, please choose only one dominant color as the representative. Avoid including multiple colors. \n");
         prompt.append("- Each recommended outfit item must include the Entity ID, Category, Item, Color, Print, Style, and Season.\n");
         prompt.append("- Provide a detailed explanation for the recommendation in JSON format as a separate field.\n");
-        prompt.append("- Please answer the reason why you chose this combination in Korean\n");
         prompt.append("- **Ensure that the JSON format is valid and properly structured.Please provide the JSON content without the enclosing json\\\\n at the beginning, \\\\n at the end, and also remove all newline characters (\\\\n) along with extra spaces and whitespace.\n");
         prompt.append("- The output must follow this exact JSON structure, ensuring that the items are ordered as top, bottom, and outerwear (if included):\n");
+        prompt.append("- Please make 10 combinations and explanations. If the wardrobe data is insufficient, feel free to reuse items to create the combinations.\n");
         prompt.append("{\n");
         prompt.append("  \"outfit\": [\n");
         prompt.append("    {\"id\": [Entity ID], \"category\": \"[Category]\", \"item\": \"[Item]\", \"color\": \"[Color]\", \"print\": \"[Print]\", \"style\": \"[Style]\", \"season\": \"[Season]\"},\n");
@@ -182,93 +183,66 @@ public class OutfitRecommendationService {
         }
     }
 
-//    private GPTRecommendationResponseDTO parseGPTResponse(String response, List<Wear> userWears) {
-//        if (response == null || response.isEmpty()) {
-//            throw new IllegalArgumentException("GPT response is empty or null");
-//        }
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            // JSON 응답을 DTO 객체로 변환
-//            GPTRecommendationResponseDTO dto = objectMapper.readValue(response, GPTRecommendationResponseDTO.class);
-//
-//            for (GPTRecommendationResponseDTO.OutfitItemDTO item : dto.getOutfit()) {
-//                Wear matchedWear = userWears.stream()
-//                        .filter(wear -> wear.getId().equals(item.getId()))
-//                        .findFirst()
-//                        .orElseThrow(() -> new IllegalArgumentException("Wear with ID " + item.getId() + " not found in user's wardrobe"));
-//
-//                if (matchedWear.getImages() != null && !matchedWear.getImages().isEmpty()) {
-//                    Image image = matchedWear.getImages().get(0);
-//                    String imageUrl = imageUtil.imageUrl(image, matchedWear);
-//                    item.setImageUrl(imageUrl);
-//                } else {
-//                    item.setImageUrl("No image available");
-//                }
-//
-//            }
-//
-//            return dto;
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("Failed to parse GPT response", e);
-//        }
-//    }
 
 
 
 
-    private GPTRecommendationResponseDTO parseGPTResponse(String response, List<Wear> userWears, Account account) {
+    private List<GPTRecommendationResponseDTO> parseGPTResponses(String response, List<Wear> userWears, Account account) {
         if (response == null || response.isEmpty()) {
             throw new IllegalArgumentException("GPT response is empty or null");
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // Parse GPT response into DTO
-            GPTRecommendationResponseDTO dto = objectMapper.readValue(response, GPTRecommendationResponseDTO.class);
+            // Parse GPT response into a list of DTOs
+            List<GPTRecommendationResponseDTO> responseDTOs = objectMapper.readValue(
+                    response, objectMapper.getTypeFactory().constructCollectionType(List.class, GPTRecommendationResponseDTO.class)
+            );
 
-            // Create a new Combination and set its attributes
-            Combination combination = new Combination();
-            combination.setAccount(account);
-            combination.setStyle(Style.valueOf(String.valueOf(dto.getOutfit().get(0).getStyle()))); // Use the style from the first outfit item
-            combination.setWeather(Weather.valueOf(String.valueOf(dto.getOutfit().get(0).getSeason()))); // Use the season from the first outfit item
-            combination.setReason(dto.getExplanation());
-            combination.setBookmarked(false);
-            combination.setViewed(false);
+            for (GPTRecommendationResponseDTO dto : responseDTOs) {
+                // Create a new Combination and set its attributes
+                Combination combination = new Combination();
+                combination.setAccount(account);
+                combination.setStyle(Style.valueOf(String.valueOf(dto.getOutfit().get(0).getStyle()))); // Use the style from the first outfit item
+                combination.setWeather(Weather.valueOf(String.valueOf(dto.getOutfit().get(0).getSeason()))); // Use the season from the first outfit item
+                combination.setReason(dto.getExplanation());
+                combination.setBookmarked(false);
+                combination.setViewed(false);
 
-            // Save Combination entity
-            combination = combinationRepository.save(combination);
+                // Save Combination entity
+                combination = combinationRepository.save(combination);
 
-            // Process each outfit item and link it to the Combination
-            for (GPTRecommendationResponseDTO.OutfitItemDTO item : dto.getOutfit()) {
-                // Find the matching Wear entity from the user's wardrobe
-                Wear matchedWear = userWears.stream()
-                        .filter(wear -> wear.getId().equals(item.getId()))
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException("Wear with ID " + item.getId() + " not found in user's wardrobe"));
+                // Process each outfit item and link it to the Combination
+                for (GPTRecommendationResponseDTO.OutfitItemDTO item : dto.getOutfit()) {
+                    // Find the matching Wear entity from the user's wardrobe
+                    Wear matchedWear = userWears.stream()
+                            .filter(wear -> wear.getId().equals(item.getId()))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("Wear with ID " + item.getId() + " not found in user's wardrobe"));
 
-                // Create and save a CombinationWear entity
-                CombinationWear combinationWear = new CombinationWear();
-                combinationWear.setCombination(combination);
-                combinationWear.setWear(matchedWear);
-                combinationWear.setAccount(account);
+                    // Create and save a CombinationWear entity
+                    CombinationWear combinationWear = new CombinationWear();
+                    combinationWear.setCombination(combination);
+                    combinationWear.setWear(matchedWear);
+                    combinationWear.setAccount(account);
 
-                combinationWearRepository.save(combinationWear);
+                    combinationWearRepository.save(combinationWear);
 
-                // Set image URL for the outfit item in the DTO (for response purposes)
-                if (matchedWear.getImages() != null && !matchedWear.getImages().isEmpty()) {
-                    Image image = matchedWear.getImages().get(0);
-                    String imageUrl = imageUtil.imageUrl(image, matchedWear);
-                    item.setImageUrl(imageUrl);
-                } else {
-                    item.setImageUrl("No image available");
+                    // Set image URL for the outfit item in the DTO (for response purposes)
+                    if (matchedWear.getImages() != null && !matchedWear.getImages().isEmpty()) {
+                        Image image = matchedWear.getImages().get(0);
+                        String imageUrl = imageUtil.imageUrl(image, matchedWear);
+                        item.setImageUrl(imageUrl);
+                    } else {
+                        item.setImageUrl("No image available");
+                    }
                 }
             }
 
-            // Return the processed DTO (with added image URLs for response)
-            return dto;
+            // Return the processed DTOs (with added image URLs for response)
+            return responseDTOs;
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to parse GPT response", e);
+            throw new IllegalArgumentException("Failed to parse GPT responses", e);
         }
     }
 }
