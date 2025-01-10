@@ -64,7 +64,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("http://localhost:*");
+    configuration.addAllowedOrigin("http://localhost:59494");
     configuration.addAllowedMethod("*");
     configuration.addAllowedHeader("*");
 
@@ -75,6 +75,7 @@ public class SecurityConfig {
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }
+
   @Bean
   public PasswordEncoder passwordEncoder() {
     Map<String, PasswordEncoder> encoders = new HashMap<>();
