@@ -32,5 +32,9 @@ public class Combination {
   @Enumerated(EnumType.STRING)
   private Style style;
 
+  private boolean viewed;
+
+  private boolean bookmarked;
+
 
 }
