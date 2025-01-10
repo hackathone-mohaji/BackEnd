@@ -128,6 +128,7 @@ public class WearService {
         if (hasTop&&hasBottom&&hasOuterwear&&hasShoes){
           //todo: 하나의 이미지 조합 생성
           account.swipable = true;
+          accountRepository.save(account);
         }
       }
 
