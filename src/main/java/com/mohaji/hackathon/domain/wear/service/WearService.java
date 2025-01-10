@@ -7,28 +7,25 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.mohaji.hackathon.common.error.enums.ErrorCode;
+import com.mohaji.hackathon.common.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.Image.util.ClippingBgUtil;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
-import com.mohaji.hackathon.domain.wear.dto.CompletionResponseDTO;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
 import com.mohaji.hackathon.domain.wear.entity.Wear;
+import com.mohaji.hackathon.domain.wear.repository.CombinationWearRepository;
 import com.mohaji.hackathon.domain.wear.repository.WearRepository;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +37,7 @@ public class WearService {
   private final ClippingBgUtil clippingBgUtil;
   private final ObjectMapper objectMapper;
   private final ImageUtil imageUtil;
+  private final CombinationWearRepository CombinationWearRepository;
 
 //        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
 //        try {
@@ -106,6 +104,30 @@ public class WearService {
       log.error("Error while mapping JSON to WearDTO", e);
       throw new RuntimeException("JSON 데이터 매핑 실패", e);
     }
+  }
+
+
+  public void deleteWear(Long wearId){
+    //해당 옷이 해당 사용자의 소유인지 확인
+    Wear wear = wearRepository.findById(wearId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.WEAR_NULL));
+
+    Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    if (!account.getId().equals(wear.getAccount().getId())) {
+      throw new BusinessException(ErrorCode.NOT_WEAR_OWN);
+    }
+
+    //콤비 옷 중간테이블 삭제
+    CombinationWearRepository.deleteAllByWearId(wearId);
+    //옷 이미지 삭제
+
+    imageUtil.deleteImage(wear);
+
+    //옷 삭제
+    wearRepository.deleteById(wearId);
+
   }
 
 }

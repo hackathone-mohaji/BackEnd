@@ -78,7 +78,7 @@ public  class ImageUtil {
 
     //이미지  삭제시키는 메서드
 
-    public static <T extends ImageEntity> void deleteImage(T entity) {
+    public  <T extends ImageEntity> void deleteImage(T entity) {
         if (entity != null) {
             for (Image image : entity.getImages()) {
                 image.delete();

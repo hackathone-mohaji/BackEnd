@@ -22,4 +22,10 @@ public class WearController {
     public void createWear(@RequestPart MultipartFile file) throws IOException {
          wearService.saveImageAndAnalyzeDate(file);
     }
+
+    @DeleteMapping("{wearId}")
+    @Secured("ROLE_USER")
+    public void deleteWear(@RequestParam Long wearId) throws IOException {
+         wearService.deleteWear(wearId);
+    }
 }
