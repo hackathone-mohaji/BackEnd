@@ -6,6 +6,7 @@ import com.mohaji.hackathon.common.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.Image.util.ClippingBgUtil;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
+import com.mohaji.hackathon.domain.auth.repository.AccountRepository;
 import com.mohaji.hackathon.domain.wear.dto.SwipeDto;
 import com.mohaji.hackathon.domain.wear.dto.SwipeDto.wearDto;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
@@ -41,6 +42,7 @@ public class WearService {
   private final CombinationWearRepository CombinationWearRepository;
   private final CombinationWearRepository combinationWearRepository;
   private final CombinationRepository combinationRepository;
+  private final AccountRepository accountRepository;
 
 //        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
 //        try {
@@ -80,6 +82,7 @@ public class WearService {
 
       Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
           .getPrincipal();
+
 
       //todo 이미지 누끼 주석 풀기
       // 1. 이미지 누끼 땀

@@ -49,13 +49,13 @@ public  class ImageUtil {
         if (entity == null || entity.getId() == null) {
             return;
         }
-
-        deleteImage(entity);
-        Image image = parseImageInfo(entity.getId(), multipartFile, imageKind);
-
         if (entity.getImages() == null) {
             entity.setImages(new ArrayList<>());
         }
+        deleteImage(entity);
+        Image image = parseImageInfo(entity.getId(), multipartFile, imageKind);
+
+
         if (!multipartFile.isEmpty()) {
             entity.getImages().add(image);
         }
