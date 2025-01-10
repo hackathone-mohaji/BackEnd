@@ -1,5 +1,8 @@
 package com.mohaji.hackathon.domain.wear.controller;
 
+import com.mohaji.hackathon.domain.wear.dto.GPTRecommendationResponseDTO;
+import com.mohaji.hackathon.domain.wear.dto.OutfitRecommendationDTO;
+import com.mohaji.hackathon.domain.wear.service.OutfitRecommendationService;
 import com.mohaji.hackathon.domain.wear.service.WearService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -16,6 +19,7 @@ import java.io.IOException;
 public class WearController {
 
     private final WearService wearService;
+    private final OutfitRecommendationService outfitRecommendationService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Secured("ROLE_USER")

@@ -43,7 +43,7 @@ public class GPTService {
     }
 
 
-    public String getGPTResponse(String prompt) {
+    public String getRecommendationFromGPT(String prompt) {
         // 요청 바디 생성
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", gptConfig.getModel());
@@ -54,6 +54,31 @@ public class GPTService {
                 .body(requestBody)
                 .retrieve()
                 .body(String.class);
+
+
+        try {
+            // 1. 원본 응답을 JsonNode로 파싱
+            JsonNode rootNode = objectMapper.readTree(response.toString());
+            log.info("RootNode: {}", rootNode.toString());
+
+            // 2. content 값 추출
+            String content = rootNode
+                    .get("choices")
+                    .get(0)
+                    .get("message")
+                    .get("content")
+                    .asText();
+            log.info("Extracted content: {}", content);
+
+            // 3. content 값을 JSON으로 바로 파싱하여 DTO로 매핑
+            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
+            log.info("Mapped WearDTO: {}", wearDto);
+
+            return wearDto;
+        } catch (Exception e) {
+            throw new RuntimeException("JSON 데이터 처리 중 오류 발생", e);
+        }
+
 
         return response;
     }

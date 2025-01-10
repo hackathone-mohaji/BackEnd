@@ -80,9 +80,9 @@ public class WearService {
 
       //todo 이미지 누끼 주석 풀기
       // 1. 이미지 누끼 땀
-      MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
+//      MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
       // 2. GPT에서 분석 결과 받기
-      WearDTO wearDto = gptService.analyzeImage(removeBackground);
+      WearDTO wearDto = gptService.analyzeImage(imageFile);
       log.info("Mapped WearDTO: {}", wearDto);
 
       // 3. Wear 엔티티 생성
@@ -98,7 +98,7 @@ public class WearService {
       wearRepository.save(wear);
 
       // 5. 이미지 저장
-      imageUtil.addImage(wear, removeBackground);
+      imageUtil.addImage(wear, imageFile);
 
     } catch (Exception e) {
       log.error("Error while mapping JSON to WearDTO", e);

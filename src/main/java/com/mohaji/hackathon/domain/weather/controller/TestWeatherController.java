@@ -1,6 +1,7 @@
 package com.mohaji.hackathon.domain.weather.controller;
 
 
+import com.mohaji.hackathon.domain.weather.dto.WeatherInfoDTO;
 import com.mohaji.hackathon.domain.weather.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class TestWeatherController {
 
 
     @GetMapping
-    public Map<String, Object> getWeather(
+    public WeatherInfoDTO getWeather(
 
             @RequestParam int nx,
             @RequestParam int ny) {
