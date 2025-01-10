@@ -1,6 +1,8 @@
 package com.mohaji.hackathon.domain.wear.controller;
 
 
+import com.mohaji.hackathon.common.error.enums.ErrorCode;
+import com.mohaji.hackathon.common.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.wear.dto.GPTRecommendationResponseDTO;
 import com.mohaji.hackathon.domain.wear.dto.SwipeDto;
 import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto.WearResponseDto;
@@ -63,7 +65,7 @@ public class WearController {
     SwipeDto swipe = wearService.swipe();
 
     if (swipe == null) {
-      return ResponseEntity.ok("옷을 추가로 등록해 주세요."); // String 반환
+      throw new BusinessException(ErrorCode.WEAR_NULL);
     }
     return ResponseEntity.ok(swipe); // SwipeDto 반환
   }
