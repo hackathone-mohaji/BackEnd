@@ -1,9 +1,9 @@
 rootProject:
   name: hackathon
 
+server:
+  port: 8888
 spring:
-  server:
-    port: 8888
   config:
     import:
       - classpath:application-secret.yml
