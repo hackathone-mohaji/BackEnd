@@ -43,6 +43,7 @@ public class WearService {
   private final CombinationWearRepository combinationWearRepository;
   private final CombinationRepository combinationRepository;
   private final AccountRepository accountRepository;
+  private final OutfitRecommendationService outfitRecommendationService;
 
 //        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
 //        try {
@@ -86,9 +87,9 @@ public class WearService {
 
       //todo 이미지 누끼 주석 풀기
       // 1. 이미지 누끼 땀
-//      MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
+      MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
       // 2. GPT에서 분석 결과 받기
-      WearDTO wearDto = gptService.analyzeImage(imageFile);
+      WearDTO wearDto = gptService.analyzeImage(removeBackground);
       log.info("Mapped WearDTO: {}", wearDto);
 
       // 3. Wear 엔티티 생성
@@ -104,7 +105,7 @@ public class WearService {
       wearRepository.save(wear);
 
       // 5. 이미지 저장
-      imageUtil.addImage(wear, imageFile);
+      imageUtil.addImage(wear, removeBackground);
 
       if(!account.swipable){
         boolean hasTop = false;
@@ -126,7 +127,8 @@ public class WearService {
           }
         }
         if (hasTop&&hasBottom&&hasOuterwear&&hasShoes){
-          //todo: 하나의 이미지 조합 생성
+
+          outfitRecommendationService.recommendOutfit();
           account.swipable = true;
           accountRepository.save(account);
         }
@@ -213,6 +215,7 @@ public class WearService {
 
   }
 
+  @Transactional
   public SwipeDto swipe() {
     //로그인된 계정조회
     Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
@@ -257,8 +260,12 @@ public class WearService {
 
     // b-a 가 음수라면 gpt api를 통해 새로운 옷 조합 10개 생성 후 저장
     if (difference < 0) {
-      //todo : gpt 한테 옷 조합 10개 추천 받고 db에 저장
-      //outfitRecommendationService.recommendOutfit();
+
+      for (int i = 0 ;  i< 10 ; i++ ){
+        outfitRecommendationService.recommendOutfit();
+
+      }
+
     }
 
     // 옷 조합 반환
