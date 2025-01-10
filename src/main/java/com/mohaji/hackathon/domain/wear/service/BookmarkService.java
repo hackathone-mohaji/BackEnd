@@ -42,4 +42,28 @@ public class BookmarkService {
         return combinationRepository.findAllByAccountIdAndBookmarkedTrue(account.getId());
     }
 
+    @Transactional
+    public List<Combination> unsetBookmark(Long combinationId) {
+        // 현재 인증된 사용자 가져오기
+        Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // combinationId로 Combination 조회
+        Combination combination = combinationRepository.findById(combinationId)
+                .orElseThrow(() -> new RuntimeException("Combination not found with id: " + combinationId));
+
+        // 사용자 권한 확인 (필요 시)
+        if (!combination.getAccount().getId().equals(account.getId())) {
+            throw new RuntimeException("You are not authorized to modify this combination.");
+        }
+
+        // bookmarked 필드 해제
+        combination.setBookmarked(false);
+
+        // 업데이트된 Combination 저장
+        combinationRepository.save(combination);
+
+        // 남아있는 북마크된 Combination 조회 및 반환
+        return combinationRepository.findAllByAccountIdAndBookmarkedTrue(account.getId());
+    }
+
 }

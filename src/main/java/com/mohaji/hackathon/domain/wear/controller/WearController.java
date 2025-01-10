@@ -67,7 +67,10 @@ public class WearController {
         bookmarkService.setBookmark(combinationId);
     }
 
-
+    @PostMapping("/bookmark/unset")
+    public List<Combination> unsetBookmark(@RequestParam("combinationId") Long combinationId) {
+        return bookmarkService.unsetBookmark(combinationId);
+    }
     @GetMapping("/bookmark")
     public List<Combination> getBookMark() {
         return bookmarkService.getBookMark();

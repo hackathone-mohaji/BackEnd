@@ -1,5 +1,6 @@
 package com.mohaji.hackathon.domain.auth.controller;
 
+import com.mohaji.hackathon.domain.auth.dto.ProfileResponseDTO;
 import com.mohaji.hackathon.domain.auth.service.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class ProfileController {
 
     @GetMapping
     @Operation(summary = "로그인된 사용자의 프로필 이미지 url을 받음")
-    public String getProfile() throws IOException {
+    public ProfileResponseDTO getProfile() throws IOException {
         return profileService.getProfile();
     }
 
