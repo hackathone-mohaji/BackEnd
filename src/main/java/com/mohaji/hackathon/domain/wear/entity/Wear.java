@@ -43,7 +43,7 @@ public class Wear implements ImageEntity {
   /**
    * 이미지 // 구현때문에 리스트 저장이고 실제로는 단일 이미지 저장
    **/
-  @OneToMany
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinTable
   @Setter
   private List<Image> images;

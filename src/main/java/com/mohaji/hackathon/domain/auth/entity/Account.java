@@ -31,7 +31,7 @@ public class Account implements UserDetails , ImageEntity {
 
   private String username;
 
-  @OneToMany
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinTable
   @Setter
   private List<Image> images;
