@@ -1,6 +1,8 @@
 package com.mohaji.hackathon.domain.auth.entity;
 
 
+import com.mohaji.hackathon.domain.Image.entity.Image;
+import com.mohaji.hackathon.domain.wear.entity.ImageEntity;
 import jakarta.persistence.*;
 
 import java.util.Collection;
@@ -17,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Account implements UserDetails {
+public class Account implements UserDetails , ImageEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +30,11 @@ public class Account implements UserDetails {
   private String password;
 
   private String username;
+
+  @OneToMany
+  @JoinTable
+  @Setter
+  private List<Image> images;
 
   public void changePassword(String newPassword) {
     this.password = newPassword;
