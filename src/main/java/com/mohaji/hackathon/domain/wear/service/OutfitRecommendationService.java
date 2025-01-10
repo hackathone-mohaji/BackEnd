@@ -29,7 +29,7 @@ public class OutfitRecommendationService {
         Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // 2. 디비에서 옷 정보 불러오기
-        List<Wear> userWears = wearRepository.findByAccount(account);
+        List<Wear> userWears = wearRepository.findAllByAccountId(account.getId());
 
         // 3. 날씨 정보 불러오기
         WeatherInfoDTO weatherInfo = weatherService.getWeatherForecast(60, 127);

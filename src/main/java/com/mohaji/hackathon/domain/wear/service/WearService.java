@@ -1,10 +1,6 @@
 package com.mohaji.hackathon.domain.wear.service;
 
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.mohaji.hackathon.common.error.enums.ErrorCode;
@@ -13,10 +9,13 @@ import com.mohaji.hackathon.domain.Image.util.ClippingBgUtil;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
+import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto;
+import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto.WearResponseDto;
 import com.mohaji.hackathon.domain.wear.entity.Wear;
 import com.mohaji.hackathon.domain.wear.repository.CombinationWearRepository;
 import com.mohaji.hackathon.domain.wear.repository.WearRepository;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +34,6 @@ public class WearService {
   private final WearRepository wearRepository;
   private final GPTService gptService;
   private final ClippingBgUtil clippingBgUtil;
-  private final ObjectMapper objectMapper;
   private final ImageUtil imageUtil;
   private final CombinationWearRepository CombinationWearRepository;
 
@@ -107,7 +105,7 @@ public class WearService {
   }
 
 
-  public void deleteWear(Long wearId){
+  public void deleteWear(Long wearId) {
     //해당 옷이 해당 사용자의 소유인지 확인
     Wear wear = wearRepository.findById(wearId)
         .orElseThrow(() -> new BusinessException(ErrorCode.WEAR_NULL));
@@ -127,6 +125,20 @@ public class WearService {
 
     //옷 삭제
     wearRepository.deleteById(wearId);
+
+  }
+
+  public List<WearResponseDto> listWearImage() {
+
+    Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+
+    List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
+
+    return wears.stream()
+        .map(wear -> new WearResponseDto(wear.getId(),
+            imageUtil.imageUrl(wear.getImages().get(0), wear))).toList();
+
 
   }
 
