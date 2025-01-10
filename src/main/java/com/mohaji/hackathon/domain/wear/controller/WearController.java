@@ -32,4 +32,9 @@ public class WearController {
     public void deleteWear(@RequestParam Long wearId) throws IOException {
          wearService.deleteWear(wearId);
     }
+
+    @PostMapping("/recommend")
+    public GPTRecommendationResponseDTO recommendWearFromGPT(){
+        return outfitRecommendationService.recommendOutfit();
+    }
 }

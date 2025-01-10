@@ -70,17 +70,11 @@ public class GPTService {
                     .asText();
             log.info("Extracted content: {}", content);
 
-            // 3. content 값을 JSON으로 바로 파싱하여 DTO로 매핑
-            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
-            log.info("Mapped WearDTO: {}", wearDto);
+            return content;
 
-            return wearDto;
         } catch (Exception e) {
             throw new RuntimeException("JSON 데이터 처리 중 오류 발생", e);
         }
-
-
-        return response;
     }
 
     public static String generatePrompt() {

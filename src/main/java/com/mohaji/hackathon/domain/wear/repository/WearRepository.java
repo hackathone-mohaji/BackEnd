@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface WearRepository extends JpaRepository<Wear, Long> {
 
-
+    List<Wear> findByAccount(Account account);
 }

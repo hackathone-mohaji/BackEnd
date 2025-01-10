@@ -1,5 +1,6 @@
 package com.mohaji.hackathon.domain.wear.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
 import com.mohaji.hackathon.domain.wear.dto.GPTRecommendationResponseDTO;
@@ -11,6 +12,7 @@ import com.mohaji.hackathon.domain.weather.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,10 +42,13 @@ public class OutfitRecommendationService {
 
         // 6. 응답 값 가공 후 리턴
         return parseGPTResponse(gptResponse, userWears);
+
+        // 7. 이미지 url 까지 첨부해서 json 작성
     }
 
     private String createPrompt(List<Wear> userWears, WeatherInfoDTO weatherInfo) {
         StringBuilder prompt = new StringBuilder("Here is the user's wardrobe data and the current weather information. Please recommend an outfit that matches the conditions.\n\n");
+
         prompt.append("1. User's wardrobe data:\n");
 
         for (Wear wear : userWears) {
@@ -65,38 +70,50 @@ public class OutfitRecommendationService {
         prompt.append("- At least one top and one bottom, or a dress, must be included.\n");
         prompt.append("- The outfit should match the temperature and weather conditions.\n");
         prompt.append("- Weather conditions such as heatwaves, heavy rain, and snowstorms must be considered.\n");
-        prompt.append("- Provide a detailed explanation for the recommendation.\n");
-
-        prompt.append("\nOutput format:\n");
-        prompt.append("- Top ID: [ID]\n");
-        prompt.append("- Bottom ID: [ID]\n");
-        prompt.append("- Outerwear ID: [ID] (optional)\n");
-        prompt.append("- Reason for recommendation: [Reason]\n");
+        prompt.append("- **Ensure the JSON format is valid and properly structured**.\n");
+        prompt.append("- Each recommended outfit item must include the Entity ID, Category, Item, Color, and Print.\n");
+        prompt.append("- Provide a detailed explanation for the recommendation in JSON format as a separate field.\n");
+        prompt.append("- Please provide the JSON content without the enclosing json\\\\n at the beginning, \\\\n at the end, and also remove all newline characters (\\\\n) along with extra spaces and whitespace.\n");
+        prompt.append("- The output must follow this exact JSON structure:\n");
+        prompt.append("- The output must follow this exact JSON structure, ensuring that the items are ordered as top, bottom, and outerwear (if included):\n");
+        prompt.append("{\n");
+        prompt.append("  \"outfit\": [\n");
+        prompt.append("    {\"id\": [Entity ID], \"category\": \"[Category]\", \"item\": \"[Item]\", \"color\": \"[Color]\", \"print\": \"[Print]\"},\n");
+        prompt.append("    {\"id\": [Entity ID], \"category\": \"[Category]\", \"item\": \"[Item]\", \"color\": \"[Color]\", \"print\": \"[Print]\"},\n");
+        prompt.append("    ...\n");
+        prompt.append("  ],\n");
+        prompt.append("  \"explanation\": \"[Detailed explanation for the recommendation]\"\n");
+        prompt.append("}\n");
 
         return prompt.toString();
     }
+
+
 
     private GPTRecommendationResponseDTO parseGPTResponse(String response, List<Wear> userWears) {
         if (response == null || response.isEmpty()) {
             throw new IllegalArgumentException("GPT response is empty or null");
         }
 
-        String[] lines = response.split("\n");
-        Long topId = parseId(lines[0]);   // 상의 ID 파싱
-        Long bottomId = parseId(lines[1]); // 하의 ID 파싱
-        Long outerId = lines.length > 2 ? parseId(lines[2]) : null; // 외투 ID 파싱
-        String reason = lines.length > 3 ? lines[3].replace("Reason for recommendation: ", "").trim() : "No reason provided.";
-
-        return new GPTRecommendationResponseDTO(topId, bottomId, outerId, reason);
-    }
-
-    private Long parseId(String line) {
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // "Top ID: [1]" 또는 "Bottom ID: [2]" 형식에서 ID를 추출
-            String idString = line.split(":")[1].trim().replace("[", "").replace("]", "");
-            return Long.parseLong(idString);
+            // JSON 응답을 DTO 객체로 변환
+            GPTRecommendationResponseDTO dto = objectMapper.readValue(response, GPTRecommendationResponseDTO.class);
+
+            // outfit 리스트를 userWears와 매핑하여 ID 기반으로 실제 Wear 엔티티를 찾음
+            for (GPTRecommendationResponseDTO.OutfitItemDTO item : dto.getOutfit()) {
+                Wear matchedWear = userWears.stream()
+                        .filter(wear -> wear.getId().equals(item.getId()))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("Wear with ID " + item.getId() + " not found in user's wardrobe"));
+
+                // 추가 작업: 매핑된 Wear 데이터를 확인하거나 필요한 처리 수행 가능
+                System.out.println("Mapped Wear: " + matchedWear);
+            }
+
+            return dto;
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to parse ID from response line: " + line, e);
+            throw new IllegalArgumentException("Failed to parse GPT response", e);
         }
     }
 }
