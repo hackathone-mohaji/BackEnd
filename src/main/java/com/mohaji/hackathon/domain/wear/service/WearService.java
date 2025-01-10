@@ -186,6 +186,7 @@ public class WearService {
       }
       if (!hasTop||!hasBottom||!hasOuterwear||!hasShoes){
         account.swipable = false;
+        accountRepository.save(account);
       }
     }
 

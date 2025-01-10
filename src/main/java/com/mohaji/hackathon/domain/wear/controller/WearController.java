@@ -61,7 +61,7 @@ public class WearController {
   @PatchMapping
   @Secured("ROLE_USER")
   @Operation(summary = "조합 반환(swipe)")
-  public ResponseEntity<?> swipe() { // ResponseEntity<?>로 변경
+  public ResponseEntity<SwipeDto> swipe() { // ResponseEntity<?>로 변경
     SwipeDto swipe = wearService.swipe();
 
     if (swipe == null) {
