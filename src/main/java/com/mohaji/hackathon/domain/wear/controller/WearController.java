@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -27,6 +28,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/wear")
 public class WearController {
 
@@ -64,6 +66,7 @@ public class WearController {
   @Secured("ROLE_USER")
   @Operation(summary = "조합 반환(swipe)")
   public ResponseEntity<SwipeDto> swipe() { // ResponseEntity<?>로 변경
+    log.info("요청 들어옴");
     SwipeDto swipe = wearService.swipe();
 
     if (swipe == null) {

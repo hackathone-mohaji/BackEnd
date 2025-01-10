@@ -85,7 +85,6 @@ public class WearService {
       Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
           .getPrincipal();
 
-
       //todo 이미지 누끼 주석 풀기
       // 1. 이미지 누끼 땀
       MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
@@ -108,7 +107,7 @@ public class WearService {
       // 5. 이미지 저장
       imageUtil.addImage(wear, removeBackground);
 
-      if(!account.swipable){
+      if (!account.swipable) {
         boolean hasTop = false;
         boolean hasBottom = false;
         boolean hasOuterwear = false;
@@ -116,18 +115,18 @@ public class WearService {
 
         List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
         wears.add(wear);
-        for (Wear checkWear : wears){
-          if(checkWear.getCategory().equals(Category.TOP)){
+        for (Wear checkWear : wears) {
+          if (checkWear.getCategory().equals(Category.TOP)) {
             hasTop = true;
-          }else if(checkWear.getCategory().equals(Category.BOTTOM)){
+          } else if (checkWear.getCategory().equals(Category.BOTTOM)) {
             hasBottom = true;
-          }else if(checkWear.getCategory().equals(Category.OUTERWEAR)){
+          } else if (checkWear.getCategory().equals(Category.OUTERWEAR)) {
             hasOuterwear = true;
-          }else if(checkWear.getCategory().equals(Category.SHOES)){
+          } else if (checkWear.getCategory().equals(Category.SHOES)) {
             hasShoes = true;
           }
         }
-        if (hasTop&&hasBottom&&hasOuterwear&&hasShoes){
+        if (hasTop && hasBottom && hasOuterwear && hasShoes) {
 
           outfitRecommendationService.recommendOutfit();
           account.swipable = true;
@@ -169,7 +168,7 @@ public class WearService {
     //한 종류의 카테고리가 존재하면 상태 변수를 true로 바꿈
     //반복문 모두 순회
     //하나라도 false가 있다면, swipable false로 변경
-    if(account.swipable){
+    if (account.swipable) {
       boolean hasTop = false;
       boolean hasBottom = false;
       boolean hasOuterwear = false;
@@ -177,18 +176,18 @@ public class WearService {
 
       List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
       wears.add(wear);
-      for (Wear checkWear : wears){
-        if(checkWear.getCategory().equals(Category.TOP)){
+      for (Wear checkWear : wears) {
+        if (checkWear.getCategory().equals(Category.TOP)) {
           hasTop = true;
-        }else if(checkWear.getCategory().equals(Category.BOTTOM)){
+        } else if (checkWear.getCategory().equals(Category.BOTTOM)) {
           hasBottom = true;
-        }else if(checkWear.getCategory().equals(Category.OUTERWEAR)){
+        } else if (checkWear.getCategory().equals(Category.OUTERWEAR)) {
           hasOuterwear = true;
-        }else if(checkWear.getCategory().equals(Category.SHOES)){
+        } else if (checkWear.getCategory().equals(Category.SHOES)) {
           hasShoes = true;
         }
       }
-      if (!hasTop||!hasBottom||!hasOuterwear||!hasShoes){
+      if (!hasTop || !hasBottom || !hasOuterwear || !hasShoes) {
         account.swipable = false;
         accountRepository.save(account);
       }
@@ -202,7 +201,7 @@ public class WearService {
     Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     List<Wear> wears;
-    if (category.isBlank()) {
+    if (category == null || category.isBlank()) {
       wears = wearRepository.findAllByAccountId(account.getId());
     } else {
       Category categoryEnum = Category.valueOf(category);
@@ -254,11 +253,13 @@ public class WearService {
     long totalCount = viewedCount + unviewedCount;
     long difference = unviewedCount - viewedCount;
 
-    List<Wear> wears = combinationWearRepository.findAllByCombinationId(combination.getId()).stream()
+    List<Wear> wears = combinationWearRepository.findAllByCombinationId(combination.getId())
+        .stream()
         .map(
             CombinationWear::getWear).toList();
     List<SwipeDto.wearDto> wearDtos = wears.stream()
-        .map(wear -> new SwipeDto.wearDto(wear, imageUtil.imageUrl(wear.getImages().get(0), wear))).toList();
+        .map(wear -> new SwipeDto.wearDto(wear, imageUtil.imageUrl(wear.getImages().get(0), wear)))
+        .toList();
     SwipeDto swipeDto = SwipeDto.builder()
         .wears(wearDtos)
         .reason(combination.getReason())
@@ -267,11 +268,10 @@ public class WearService {
         .totalCount(totalCount)
         .build();
 
-
     // b-a 가 음수라면 gpt api를 통해 새로운 옷 조합 10개 생성 후 저장
     if (difference < 0) {
 
-      for (int i = 0 ;  i< 10 ; i++ ){
+      for (int i = 0; i < 10; i++) {
         outfitRecommendationService.recommendOutfit();
 
       }
@@ -279,7 +279,6 @@ public class WearService {
     }
 
     // 옷 조합 반환
-
 
     return swipeDto;
   }
