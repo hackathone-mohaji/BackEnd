@@ -26,8 +26,8 @@ public class SwipeDto {
   private String reason;
 
   private boolean bookmarked;
-  @Setter
-  private boolean animation;
+
+  private long totalCount;
 
 
 

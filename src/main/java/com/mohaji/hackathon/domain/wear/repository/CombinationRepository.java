@@ -10,6 +10,7 @@ public interface CombinationRepository extends JpaRepository<Combination, Long> 
   long countByAccountIdAndViewed(Long accountId, boolean viewed);
   Combination findRandomByAccountId(Long accountId);
     List<Combination> findAllByAccountId(Long accountId);
+    long countByAccountId(Long accountId);
 
     List<Combination> findAllByAccountIdAndBookmarkedTrue(Long accountId);
 }

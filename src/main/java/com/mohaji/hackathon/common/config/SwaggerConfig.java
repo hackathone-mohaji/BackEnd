@@ -53,7 +53,7 @@ public class SwaggerConfig {
                                 .name("VoQal")
                                 .url("https://github.com/hackathone-mohaji/BackEnd")))
                 .servers(List.of(
-                        new io.swagger.v3.oas.models.servers.Server().url("http://localhost:8888").description("Local HTTP server")
+                        new io.swagger.v3.oas.models.servers.Server().url("http://182.214.198.108:8888").description("Local HTTP server")
 
                 ));
     }

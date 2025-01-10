@@ -128,6 +128,7 @@ public class WearService {
         if (hasTop&&hasBottom&&hasOuterwear&&hasShoes){
           //todo: 하나의 이미지 조합 생성
           account.swipable = true;
+          accountRepository.save(account);
         }
       }
 
@@ -186,6 +187,7 @@ public class WearService {
       }
       if (!hasTop||!hasBottom||!hasOuterwear||!hasShoes){
         account.swipable = false;
+        accountRepository.save(account);
       }
     }
 
@@ -238,6 +240,7 @@ public class WearService {
     // a+b가 짝수일때 b-a 가 0 이거나 a+b가 홀수 일때 b-a 가 1 이라면 animation 키워드 반환
     long totalCount = viewedCount + unviewedCount;
     long difference = unviewedCount - viewedCount;
+
     List<Wear> wears = combinationWearRepository.findAllByCombinationId(combination.getId()).stream()
         .map(
             CombinationWear::getWear).toList();
@@ -248,13 +251,9 @@ public class WearService {
         .reason(combination.getReason())
         .bookmarked(combination.bookmarked)
         .combinationId(combination.getId())
+        .totalCount(totalCount)
         .build();
 
-    if (totalCount % 2 == 0 && difference == 0) {
-      swipeDto.setAnimation(true);
-    } else if (totalCount % 2 != 0 && difference == 1) {
-      swipeDto.setAnimation(true);
-    }
 
     // b-a 가 음수라면 gpt api를 통해 새로운 옷 조합 10개 생성 후 저장
     if (difference < 0) {
