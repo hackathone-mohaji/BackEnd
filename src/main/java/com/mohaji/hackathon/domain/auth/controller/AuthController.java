@@ -25,6 +25,7 @@ import reactor.netty.http.server.HttpServerResponse;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
 

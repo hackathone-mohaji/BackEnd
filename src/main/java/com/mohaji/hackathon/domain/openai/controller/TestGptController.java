@@ -1,6 +1,5 @@
 package com.mohaji.hackathon.domain.openai.controller;
 
-import com.mohaji.hackathon.domain.openai.dto.ChatRequestDTO;
 import com.mohaji.hackathon.domain.openai.service.FineTuneExample;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
@@ -9,21 +8,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-public class GPTController {
+public class TestGptController {
 
     private final GPTService gptService;
     private final FineTuneExample fineTuneExample;
 
+/*
     @PostMapping("/chat")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<String> chatWithGPT(@RequestBody ChatRequestDTO request) {
@@ -31,6 +29,7 @@ public class GPTController {
         String response = gptService.getGPTResponse(prompt);
         return ResponseEntity.ok(response);
     }
+*/
 
     @PostMapping(value = "/image_upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ROLE_USER')")

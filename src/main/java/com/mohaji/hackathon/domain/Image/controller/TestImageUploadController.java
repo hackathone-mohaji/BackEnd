@@ -4,24 +4,19 @@ package com.mohaji.hackathon.domain.Image.controller;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.wear.entity.Wear;
 import com.mohaji.hackathon.domain.wear.repository.WearRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
-public class ImageUploadTestController {
+public class TestImageUploadController {
 
     private final ImageUtil imageUtil;
     private final WearRepository wearRepository;
