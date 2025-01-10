@@ -39,5 +39,8 @@ public class GPTRecommendationResponseDTO {
 
         @JsonProperty("print") // JSON 키 "print"와 매핑
         private String print;
+
+        @JsonProperty("imageUrl") // 이미지 URL을 매핑
+        private String imageUrl;
     }
 }

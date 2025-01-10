@@ -1,6 +1,8 @@
 package com.mohaji.hackathon.domain.wear.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mohaji.hackathon.domain.Image.entity.Image;
+import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
 import com.mohaji.hackathon.domain.wear.dto.GPTRecommendationResponseDTO;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +26,7 @@ public class OutfitRecommendationService {
     private final WeatherService weatherService;
     private final WearRepository wearRepository;
     private final GPTService gptService;
+    private final ImageUtil imageUtil;
 
     public GPTRecommendationResponseDTO recommendOutfit() {
         // 1. 회원 정보 불러오기
@@ -100,15 +104,20 @@ public class OutfitRecommendationService {
             // JSON 응답을 DTO 객체로 변환
             GPTRecommendationResponseDTO dto = objectMapper.readValue(response, GPTRecommendationResponseDTO.class);
 
-            // outfit 리스트를 userWears와 매핑하여 ID 기반으로 실제 Wear 엔티티를 찾음
             for (GPTRecommendationResponseDTO.OutfitItemDTO item : dto.getOutfit()) {
                 Wear matchedWear = userWears.stream()
                         .filter(wear -> wear.getId().equals(item.getId()))
                         .findFirst()
                         .orElseThrow(() -> new IllegalArgumentException("Wear with ID " + item.getId() + " not found in user's wardrobe"));
 
-                // 추가 작업: 매핑된 Wear 데이터를 확인하거나 필요한 처리 수행 가능
-                System.out.println("Mapped Wear: " + matchedWear);
+                if (matchedWear.getImages() != null && !matchedWear.getImages().isEmpty()) {
+                    Image image = matchedWear.getImages().get(0);
+                    String imageUrl = imageUtil.imageUrl(image, matchedWear);
+                    item.setImageUrl(imageUrl);
+                } else {
+                    item.setImageUrl("No image available");
+                }
+
             }
 
             return dto;
