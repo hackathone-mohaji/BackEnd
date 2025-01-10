@@ -12,6 +12,7 @@ import com.mohaji.hackathon.domain.wear.dto.WearDTO;
 import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto;
 import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto.WearResponseDto;
 import com.mohaji.hackathon.domain.wear.entity.Wear;
+import com.mohaji.hackathon.domain.wear.enums.Att.Category;
 import com.mohaji.hackathon.domain.wear.repository.CombinationWearRepository;
 import com.mohaji.hackathon.domain.wear.repository.WearRepository;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
@@ -137,7 +138,8 @@ public class WearService {
     if (category.isBlank()) {
       wears = wearRepository.findAllByAccountId(account.getId());
     } else {
-      wears = wearRepository.findAllByAccountIdAndCategory(account.getId(), category);
+      Category categoryEnum = Category.valueOf(category);
+      wears = wearRepository.findAllByAccountIdAndCategory(account.getId(), categoryEnum);
     }
 
     return wears.stream()
