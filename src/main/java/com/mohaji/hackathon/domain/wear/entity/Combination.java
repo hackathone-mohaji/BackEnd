@@ -1,5 +1,6 @@
 package com.mohaji.hackathon.domain.wear.entity;
 
+import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.wear.enums.Style;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,6 +36,9 @@ public class Combination {
   private boolean viewed;
 
   private boolean bookmarked;
+
+  @ManyToOne
+  private Account account;
 
 
 }
