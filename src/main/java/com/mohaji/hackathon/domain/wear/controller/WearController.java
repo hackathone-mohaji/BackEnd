@@ -27,16 +27,16 @@ import java.io.IOException;
 @RequestMapping("/wear")
 public class WearController {
 
-    private final WearService wearService;
-    private final OutfitRecommendationService outfitRecommendationService;
-    private final BookmarkService bookmarkService;
+  private final WearService wearService;
+  private final OutfitRecommendationService outfitRecommendationService;
+  private final BookmarkService bookmarkService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "개별 옷 이미지 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
-    @Secured("ROLE_USER")
-    public void createWear(@RequestPart MultipartFile file) throws IOException {
-         wearService.saveImageAndAnalyzeDate(file);
-    }
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(summary = "개별 옷 이미지 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
+  @Secured("ROLE_USER")
+  public void createWear(@RequestPart MultipartFile file) throws IOException {
+    wearService.saveImageAndAnalyzeDate(file);
+  }
 
   @DeleteMapping("/{wearId}")
   @Secured("ROLE_USER")
@@ -48,7 +48,8 @@ public class WearController {
   @GetMapping
   @Secured("ROLE_USER")
   @Operation(summary = "로그인한 사용자의 이미지를 반환함, 쿼리 파라미터로 category를 넘기면 필터링됨")
-  public ResponseEntity<List<WearResponseDto>> listWearImage(@RequestParam(required = false) String category) {
+  public ResponseEntity<List<WearResponseDto>> listWearImage(
+      @RequestParam(required = false) String category) {
 
     List<WearResponseDto> wearResponseDtos = wearService.listWearImage(category);
 
@@ -57,25 +58,30 @@ public class WearController {
 
   @PatchMapping
   @Secured("ROLE_USER")
-  @Operation(summary = "조합반환")
-  public ResponseEntity<SwipeDto> swipe() {
+  @Operation(summary = "조합 반환(swipe)")
+  public ResponseEntity<?> swipe() { // ResponseEntity<?>로 변경
+    SwipeDto swipe = wearService.swipe();
 
-    return ResponseEntity.ok(wearService.swipe());
+    if (swipe == null) {
+      return ResponseEntity.ok("옷을 추가로 등록해 주세요."); // String 반환
+    }
+    return ResponseEntity.ok(swipe); // SwipeDto 반환
   }
 
 
-    @PostMapping("/bookmark")
-    public void setBookMark(@RequestParam("combinationId") Long combinationId) {
-        bookmarkService.setBookmark(combinationId);
-    }
+  @PostMapping("/bookmark")
+  public void setBookMark(@RequestParam("combinationId") Long combinationId) {
+    bookmarkService.setBookmark(combinationId);
+  }
 
-    @PostMapping("/bookmark/unset")
-    public List<Combination> unsetBookmark(@RequestParam("combinationId") Long combinationId) {
-        return bookmarkService.unsetBookmark(combinationId);
-    }
-    @GetMapping("/bookmark")
-    public List<Combination> getBookMark() {
-        return bookmarkService.getBookMark();
-    }
+  @PostMapping("/bookmark/unset")
+  public List<Combination> unsetBookmark(@RequestParam("combinationId") Long combinationId) {
+    return bookmarkService.unsetBookmark(combinationId);
+  }
+
+  @GetMapping("/bookmark")
+  public List<Combination> getBookMark() {
+    return bookmarkService.getBookMark();
+  }
 }
 

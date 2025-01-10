@@ -216,6 +216,10 @@ public class WearService {
     Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
 
+    if (!account.swipable) {
+      return null;
+    }
+
     // 자신의 옷 조합 중 DB에 미리 저장된 옷 조합에서 랜덤으로 하나 가져오기
     Combination combination = combinationRepository.findRandomByAccountId(
         account.getId());
