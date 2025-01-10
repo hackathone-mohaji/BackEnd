@@ -64,11 +64,13 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080")); // 와일드카드(*) 대신 구체적인 도메인
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-    configuration.setAllowedHeaders(Arrays.asList("*"));
+    configuration.addAllowedOrigin("http://localhost:53908");
+    configuration.addAllowedMethod("*");
+    configuration.addAllowedHeader("*");
+
     configuration.setAllowCredentials(true); // 중요: 쿠키 전송을 위해 필요
 
+    configuration.setMaxAge(3600L);
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
