@@ -64,7 +64,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:*")); // 와일드카드(*) 대신 구체적인 도메인
+    configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
     configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true); // 중요: 쿠키 전송을 위해 필요
