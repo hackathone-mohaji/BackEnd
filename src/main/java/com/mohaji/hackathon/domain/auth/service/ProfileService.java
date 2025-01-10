@@ -1,8 +1,11 @@
 package com.mohaji.hackathon.domain.auth.service;
 
+import com.mohaji.hackathon.common.error.enums.ErrorCode;
+import com.mohaji.hackathon.common.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.Image.entity.Image;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
+import com.mohaji.hackathon.domain.auth.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,14 +16,18 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class EditProfileService {
+public class ProfileService {
 
     private final ImageUtil imageUtil;
+    private final AccountRepository accountRepository;
 
     @Transactional
     public void setProfile(MultipartFile profile) throws IOException {
         Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
+        account = accountRepository.findById(account.getId()).orElseThrow(()-> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+
+
         imageUtil.addImage(account,profile);
     }
 
@@ -28,9 +35,11 @@ public class EditProfileService {
     public String getProfile() throws IOException {
         Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
+        account = accountRepository.findById(account.getId()).orElseThrow(()-> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
         Image image = account.getImages().get(0);
         return imageUtil.imageUrl(image,account);
     }
+
 
 
 

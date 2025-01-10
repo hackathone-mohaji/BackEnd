@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -34,39 +34,11 @@ public  class ImageUtil {
 
 
 
-
-
-    /**
-     * 이미지 추가 (이미지 리스트)// 수정로직에서 사용하면 기존에 존재하는 이미지를 삭제처리하고 추가
-     **/
-    @Transactional
-    public  <T extends ImageEntity> void addImage(
-            T entity,
-            List<MultipartFile> multipartFiles) throws IOException {
-        for (MultipartFile multipartFile : multipartFiles) {
-            validateImage(multipartFile);
-        }
-        ImageKind imageKind = ImageKind.fromEntity(entity);
-
-        if (entity == null || entity.getId() == null) {
-            return;
-        }
-
-        List<Image> imageList = parseImageInfo(entity.getId(), multipartFiles, imageKind);
-
-        if (entity.getImages() == null) {
-            entity.setImages(new ArrayList<>());
-        }
-        if (!imageList.isEmpty()) {
-            entity.getImages().addAll(imageList);
-        }
-
-    }
     /**
      *  이미지 추가 (단일 이미지)// 수정로직에서 사용하면 기존에 존재하는 이미지를 논리적 삭제처리하고 추가
      **/
-    //배경 지워짐
 
+    @Transactional
     public  <T extends ImageEntity> void addImage (
             T entity,
             MultipartFile multipartFile) throws IOException {
@@ -78,6 +50,7 @@ public  class ImageUtil {
             return;
         }
 
+        deleteImage(entity);
         Image image = parseImageInfo(entity.getId(), multipartFile, imageKind);
 
         if (entity.getImages() == null) {
@@ -104,47 +77,21 @@ public  class ImageUtil {
 
 
     //이미지  삭제시키는 메서드
-    //todo: 실제 이미지도 삭제되도록 해야함
-    public  <T extends ImageEntity> void deleteImage(T entity) {
+
+    public static <T extends ImageEntity> void deleteImage(T entity) {
         if (entity != null) {
-            imageRepository.deleteAll(entity.getImages());
+            for (Image image : entity.getImages()) {
+                image.delete();
+            }
         }
     }
+
 
 
 
 
     /*----------------------private 매서드-------------------------*/
 
-
-    // 이미지객체로 변환, db저장(이미지 리스트)
-    private  List<Image> parseImageInfo(Long parentId, List<MultipartFile> multipartFiles,
-                                        ImageKind imageKind) throws IOException {
-
-
-        // if empty, return null
-        if (multipartFiles == null || multipartFiles.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        // new files
-        List<Image> newFileList = new ArrayList<>();
-        for (MultipartFile multipartFile : multipartFiles) {
-            if (!multipartFile.isEmpty()) {
-                Image image = Image.builder()
-                        .parentId(parentId)
-                        .kind(imageKind.getId())
-                        .originalFileName(multipartFile.getOriginalFilename())
-                        .storedFilePath(imageKind.getDirName())
-                        .fileSize(multipartFile.getSize())
-                        .build();
-                imageRepository.save(image);
-                newFileList.add(image);
-                saveFile(parentId, multipartFile, image);
-            }
-        }
-        return newFileList;
-    }
 
     // 이미지객체로 변환, db저장(단일 이미지)
     private Image parseImageInfo(Long parentId, MultipartFile multipartFile,

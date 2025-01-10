@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum ImageKind {
     DEFAULT(0,"image/default","기타 이미지"),
     WEAR(1,"image/wear","옷"),
+    PROFILE(1,"image/profile","프로필"),
     ;
 
     private Integer id;
@@ -23,6 +24,7 @@ public enum ImageKind {
         //자바 버전이 낮아서 switch-case 문에서 Class<?> 를 사용할 수 없고 대신 이름으로 해야 함
         return switch (entity.getClass().getSimpleName()) {
             case "Wear" -> WEAR;
+            case "Account" -> PROFILE;
             default -> DEFAULT;
         };
     }

@@ -1,9 +1,10 @@
 package com.mohaji.hackathon.domain.auth.controller;
 
-import com.mohaji.hackathon.domain.auth.service.EditProfileService;
+import com.mohaji.hackathon.domain.auth.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,15 +19,16 @@ import java.io.IOException;
 @Slf4j
 @RequestMapping("/profile")
 public class ProfileController {
-    private final EditProfileService editProfileService;
+    private final ProfileService profileService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void setProfile(@RequestPart MultipartFile profile) throws IOException {
-        editProfileService.setProfile(profile);
+        profileService.setProfile(profile);
     }
 
     @GetMapping
     public String getProfile() throws IOException {
-        return editProfileService.getProfile();
+        return profileService.getProfile();
     }
+
 }
