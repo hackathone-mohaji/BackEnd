@@ -106,13 +106,39 @@ public class WearService {
       // 5. 이미지 저장
       imageUtil.addImage(wear, imageFile);
 
+      if(!account.swipable){
+        boolean hasTop = false;
+        boolean hasBottom = false;
+        boolean hasOuterwear = false;
+        boolean hasShoes = false;
+
+        List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
+        wears.add(wear);
+        for (Wear checkWear : wears){
+          if(checkWear.getCategory().equals(Category.TOP)){
+            hasTop = true;
+          }else if(checkWear.getCategory().equals(Category.BOTTOM)){
+            hasBottom = true;
+          }else if(checkWear.getCategory().equals(Category.OUTERWEAR)){
+            hasOuterwear = true;
+          }else if(checkWear.getCategory().equals(Category.SHOES)){
+            hasShoes = true;
+          }
+        }
+        if (hasTop&&hasBottom&&hasOuterwear&&hasShoes){
+          //todo: 하나의 이미지 조합 생성
+          account.swipable = true;
+        }
+      }
+
+
     } catch (Exception e) {
       log.error("Error while mapping JSON to WearDTO", e);
       throw new RuntimeException("JSON 데이터 매핑 실패", e);
     }
   }
 
-
+  @Transactional
   public void deleteWear(Long wearId) {
     //해당 옷이 해당 사용자의 소유인지 확인
     Wear wear = wearRepository.findById(wearId)
@@ -128,11 +154,40 @@ public class WearService {
     //콤비 옷 중간테이블 삭제
     CombinationWearRepository.deleteAllByWearId(wearId);
     //옷 이미지 삭제
-
     imageUtil.deleteImage(wear);
-
     //옷 삭제
     wearRepository.deleteById(wearId);
+
+    //account의 swipable이 true일 경우
+    //사용자로 wear 전체 조회
+    //리스트에 현재 제거하려는 wear가 있다면 제거
+    //반복 순회로 카테고리 조회
+    //한 종류의 카테고리가 존재하면 상태 변수를 true로 바꿈
+    //반복문 모두 순회
+    //하나라도 false가 있다면, swipable false로 변경
+    if(account.swipable){
+      boolean hasTop = false;
+      boolean hasBottom = false;
+      boolean hasOuterwear = false;
+      boolean hasShoes = false;
+
+      List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
+      wears.add(wear);
+      for (Wear checkWear : wears){
+        if(checkWear.getCategory().equals(Category.TOP)){
+          hasTop = true;
+        }else if(checkWear.getCategory().equals(Category.BOTTOM)){
+          hasBottom = true;
+        }else if(checkWear.getCategory().equals(Category.OUTERWEAR)){
+          hasOuterwear = true;
+        }else if(checkWear.getCategory().equals(Category.SHOES)){
+          hasShoes = true;
+        }
+      }
+      if (!hasTop||!hasBottom||!hasOuterwear||!hasShoes){
+        account.swipable = false;
+      }
+    }
 
   }
 

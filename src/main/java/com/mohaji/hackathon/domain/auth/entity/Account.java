@@ -31,6 +31,8 @@ public class Account implements UserDetails , ImageEntity {
 
   private String username;
 
+  public boolean swipable;
+
   @OneToMany(cascade = CascadeType.ALL)
   @JoinTable
   @Setter
