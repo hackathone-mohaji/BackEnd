@@ -128,12 +128,17 @@ public class WearService {
 
   }
 
-  public List<WearResponseDto> listWearImage() {
+
+  public List<WearResponseDto> listWearImage(String category) {
 
     Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
-
-    List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
+    List<Wear> wears;
+    if (category.isBlank()) {
+      wears = wearRepository.findAllByAccountId(account.getId());
+    } else {
+      wears = wearRepository.findAllByAccountIdAndCategory(account.getId(), category);
+    }
 
     return wears.stream()
         .map(wear -> new WearResponseDto(wear.getId(),

@@ -37,8 +37,9 @@ public class WearController {
 
   @GetMapping
   @Secured("ROLE_USER")
-  public ResponseEntity<List<WearResponseDto>> listWearImage() {
-    List<WearResponseDto> wearResponseDtos = wearService.listWearImage();
+  public ResponseEntity<List<WearResponseDto>> listWearImage(@RequestParam(required = false) String category) {
+
+    List<WearResponseDto> wearResponseDtos = wearService.listWearImage(category);
 
     return ResponseEntity.ok(wearResponseDtos);
   }

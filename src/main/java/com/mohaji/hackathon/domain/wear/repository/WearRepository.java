@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface WearRepository extends JpaRepository<Wear, Long> {
 
   List<Wear> findAllByAccountId(Long accountId);
+  List<Wear> findAllByAccountIdAndCategory(Long accountId,String category);
 }
