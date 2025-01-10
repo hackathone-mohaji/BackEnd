@@ -83,5 +83,11 @@ public class WearController {
   public List<Combination> getBookMark() {
     return bookmarkService.getBookMark();
   }
+
+
+    @GetMapping("/test")
+    public GPTRecommendationResponseDTO test(){
+        return outfitRecommendationService.recommendOutfit();
+    }
 }
 

@@ -1,6 +1,12 @@
 package com.mohaji.hackathon.domain.wear.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mohaji.hackathon.domain.wear.enums.Att.Category;
+import com.mohaji.hackathon.domain.wear.enums.Att.Color;
+import com.mohaji.hackathon.domain.wear.enums.Att.Item;
+import com.mohaji.hackathon.domain.wear.enums.Att.Print;
+import com.mohaji.hackathon.domain.wear.enums.Style;
+import com.mohaji.hackathon.domain.wear.enums.Weather;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,16 +35,22 @@ public class GPTRecommendationResponseDTO {
         private Long id;
 
         @JsonProperty("category") // JSON 키 "category"와 매핑
-        private String category;
+        private Category category;
 
         @JsonProperty("item") // JSON 키 "item"와 매핑
-        private String item;
+        private Item item;
 
         @JsonProperty("color") // JSON 키 "color"와 매핑
-        private String color;
+        private Color color;
 
         @JsonProperty("print") // JSON 키 "print"와 매핑
-        private String print;
+        private Print print;
+
+        @JsonProperty("style") // JSON 키 "style"와 매핑
+        private Style style;
+
+        @JsonProperty("season") // JSON 키 "season"와 매핑
+        private Weather season;
 
         @JsonProperty("imageUrl") // 이미지 URL을 매핑
         private String imageUrl;

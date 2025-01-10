@@ -1,7 +1,10 @@
 package com.mohaji.hackathon.domain.openai.service;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mohaji.hackathon.common.error.enums.ErrorCode;
+import com.mohaji.hackathon.common.error.exception.BusinessException;
 import com.mohaji.hackathon.domain.openai.config.GptConfig;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
 import com.mohaji.hackathon.domain.wear.enums.Att.Category;
@@ -148,8 +151,8 @@ public class GPTService {
             log.info("Mapped WearDTO: {}", wearDto);
 
             return wearDto;
-        } catch (Exception e) {
-            throw new RuntimeException("JSON 데이터 처리 중 오류 발생", e);
+        } catch (JsonParseException e) {
+            throw new BusinessException(ErrorCode.WRONG_IMAGE);
         }
     }
 }

@@ -87,6 +87,7 @@ public enum ErrorCode {
 
     //날씨정보
     WEATHER_INFORMATION_NOT_FOUND(400,"WI001","날씨 정보를 찾을 수 없습니다."),
+    WRONG_IMAGE(400,"WI001","잘못된 이미지를 입력했습니다. 올바른 이미지를 입력해주세요"),
 
     //FCM 관련
     FAIL_TO_SEND_PUSH_NOTIFICATION(400,"F001","푸시알림 전송 요청을 실패했습니다");

@@ -3,13 +3,7 @@ package com.mohaji.hackathon.domain.wear.entity;
 import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.wear.enums.Weather;
 import com.mohaji.hackathon.domain.wear.enums.Style;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +36,7 @@ public class Combination {
   private Account account;
 
 
+  @Column(length = 10000)
   private String  reason;
 
   private Weather weather;
