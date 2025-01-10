@@ -20,6 +20,7 @@ import com.mohaji.hackathon.domain.wear.repository.CombinationWearRepository;
 import com.mohaji.hackathon.domain.wear.repository.WearRepository;
 import com.mohaji.hackathon.domain.openai.service.GPTService;
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -226,9 +227,18 @@ public class WearService {
     }
 
     // 자신의 옷 조합 중 DB에 미리 저장된 옷 조합에서 랜덤으로 하나 가져오기
-    Combination combination = combinationRepository.findRandomByAccountId(
+    List<Combination> combinations = combinationRepository.findAllByAccountId(
         account.getId());
-    if (combination == null) {
+
+    Random random = new Random();
+
+// 리스트 크기 내에서 무작위 인덱스 생성
+    int randomIndex = random.nextInt(combinations.size());
+
+// 무작위로 선택된 요소
+    Combination combination = combinations.get(randomIndex);
+
+    if (combinations == null) {
       throw new BusinessException(ErrorCode.COMBINATION_NULL);
     }
 
