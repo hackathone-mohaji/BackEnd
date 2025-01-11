@@ -1,3 +1,4 @@
+/*
 package com.mohaji.hackathon.domain.openai.controller;
 
 import com.mohaji.hackathon.domain.openai.service.FineTuneExample;
@@ -21,6 +22,7 @@ public class TestGptController {
     private final GPTService gptService;
     private final FineTuneExample fineTuneExample;
 
+*/
 /*
     @PostMapping("/chat")
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -29,7 +31,8 @@ public class TestGptController {
         String response = gptService.getGPTResponse(prompt);
         return ResponseEntity.ok(response);
     }
-*/
+*//*
+
 
     @PostMapping(value = "/image_upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -49,4 +52,4 @@ public class TestGptController {
             return ResponseEntity.badRequest().body("Error occurred: " + e.getMessage());
         }
     }
-}
+}*/

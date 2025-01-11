@@ -92,7 +92,7 @@ public class WearController {
   }
 
 
-    @GetMapping("/test")
+/*    @GetMapping("/test")
     public GPTRecommendationResponseDTO test(){
         return outfitRecommendationService.recommendOutfit();
     }
@@ -100,6 +100,6 @@ public class WearController {
     @GetMapping("/test22222")
     public GPTRecommendationResponseDTO test2(){
         return tenService.TenrecommendOutfit();
-    }
+    }*/
 }
 

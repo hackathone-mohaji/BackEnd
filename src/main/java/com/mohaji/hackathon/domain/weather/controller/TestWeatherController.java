@@ -1,3 +1,4 @@
+/*
 package com.mohaji.hackathon.domain.weather.controller;
 
 
@@ -27,3 +28,4 @@ public class TestWeatherController {
         return weatherService.getWeatherForecast(nx, ny);
     }
 }
+*/
