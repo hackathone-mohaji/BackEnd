@@ -1,7 +1,9 @@
 package com.mohaji.hackathon.common.config;
 
 
-import java.util.Arrays;
+import com.mohaji.hackathon.common.security.CustomUserDetailService;
+import com.mohaji.hackathon.common.security.JwtAuthenticationEntryPoint;
+import com.mohaji.hackathon.common.security.JwtFilter;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -10,22 +12,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -35,6 +30,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+  private final CustomUserDetailService customUserDetailService;
+
+
+
   @Bean
   public HttpSessionEventPublisher httpSessionEventPublisher() {
     return new HttpSessionEventPublisher();
@@ -45,17 +48,23 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .sessionManagement(session -> session
-            .sessionFixation().migrateSession()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint) // Custom Entry Point 설정
         )
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> {
           //   auth.requestMatchers("/**").permitAll();
-          auth.requestMatchers("/error","/swagger-ui/**", "/v3/api-docs/**", "/auth/login", "/auth/signup", "/","/swagger")
+          auth.requestMatchers("/error", "/swagger-ui/**", "/v3/api-docs/**", "/auth/**", "/",
+                  "/swagger", "/favicon.ico", "/csrf", "/webjars/**", "/swagger-resources/**", "/v2/**",
+                  "/gen/**")
               .permitAll();
           auth.anyRequest().authenticated();
         })
-        .logout(Customizer.withDefaults());
+
+        .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
 
@@ -64,11 +73,11 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("http://localhost:63482");
+    configuration.addAllowedOriginPattern("*");
     configuration.addAllowedMethod("*");
     configuration.addAllowedHeader("*");
 
-    configuration.setAllowCredentials(true); // 중요: 쿠키 전송을 위해 필요
+    configuration.setAllowCredentials(false); // 중요: 쿠키 전송을 위해 필요
 
     configuration.setMaxAge(3600L);
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -82,20 +91,16 @@ public class SecurityConfig {
     encoders.put("bcrypt", new BCryptPasswordEncoder());
     return new DelegatingPasswordEncoder("bcrypt", encoders);
   }
+
   @Bean
   public AuthenticationManager authenticationManager(
-      UserDetailsService userDetailsService,
       PasswordEncoder passwordEncoder) {
     DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-    authenticationProvider.setUserDetailsService(userDetailsService);
+    authenticationProvider.setUserDetailsService(customUserDetailService);
     authenticationProvider.setPasswordEncoder(passwordEncoder);
     return new ProviderManager(authenticationProvider);
   }
-  @Bean
-  public HttpSessionSecurityContextRepository securityContextRepository() {
-    HttpSessionSecurityContextRepository repository = new HttpSessionSecurityContextRepository();
-    repository.setSpringSecurityContextKey(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
-    return repository;
-  }
+
+
 
 }

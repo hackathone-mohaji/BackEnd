@@ -3,6 +3,7 @@ package com.mohaji.hackathon.domain.wear.service;
 
 import com.mohaji.hackathon.common.error.enums.ErrorCode;
 import com.mohaji.hackathon.common.error.exception.BusinessException;
+import com.mohaji.hackathon.common.security.SecurityUtil;
 import com.mohaji.hackathon.domain.Image.util.ClippingBgUtil;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
@@ -45,6 +46,7 @@ public class WearService {
   private final CombinationRepository combinationRepository;
   private final AccountRepository accountRepository;
   private final OutfitRecommendationService outfitRecommendationService;
+  private final SecurityUtil securityUtil;
 
 //        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
 //        try {
@@ -81,9 +83,7 @@ public class WearService {
   @Transactional
   public void saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
     try {
-
-      Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
-          .getPrincipal();
+      Account account = securityUtil.getAccount();
 
       //todo 이미지 누끼 주석 풀기
       // 1. 이미지 누끼 땀
@@ -147,8 +147,7 @@ public class WearService {
     Wear wear = wearRepository.findById(wearId)
         .orElseThrow(() -> new BusinessException(ErrorCode.WEAR_NULL));
 
-    Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
+    Account account = securityUtil.getAccount();
 
     if (!account.getId().equals(wear.getAccount().getId())) {
       throw new BusinessException(ErrorCode.NOT_WEAR_OWN);
@@ -198,8 +197,7 @@ public class WearService {
 
   public List<WearResponseDto> listWearImage(String category) {
 
-    Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
+    Account account = securityUtil.getAccount();
     List<Wear> wears;
     if (category == null || category.isBlank()) {
       wears = wearRepository.findAllByAccountId(account.getId());
@@ -218,8 +216,7 @@ public class WearService {
   @Transactional
   public SwipeDto swipe() {
     //로그인된 계정조회
-    Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
+    Account account = securityUtil.getAccount();
 
     if (!account.swipable) {
       return null;

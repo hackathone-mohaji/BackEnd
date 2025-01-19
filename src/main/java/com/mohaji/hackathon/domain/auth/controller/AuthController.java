@@ -3,6 +3,7 @@ package com.mohaji.hackathon.domain.auth.controller;
 
 
 import com.mohaji.hackathon.common.security.CustomUserDetailService;
+import com.mohaji.hackathon.domain.auth.dto.AccountLoginResponseDto;
 import com.mohaji.hackathon.domain.auth.service.AuthService;
 import com.mohaji.hackathon.common.error.exception.ErrorResponse;
 import com.mohaji.hackathon.domain.auth.dto.LoginRequestDTO;
@@ -42,6 +43,7 @@ public class AuthController {
         return ResponseEntity.ok(responseDTO);
     }
 
+
     @PostMapping("/login")
     @Operation(summary = "로그인 로직", description = "이메일, 비밀번호를 입력하면 검증 후 로그인을 진행하고 성공하면 access Token, Refresh Token을 발급합니다.",
             responses = {
@@ -50,11 +52,10 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "유효하지 않은 입력값입니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "400", description = "토큰 관련 오류들.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             })
-    public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO,
-        HttpServletRequest req, HttpServletResponse res) {
+    public ResponseEntity<AccountLoginResponseDto> login(@RequestBody @Valid LoginRequestDTO loginRequestDTO) {
 
-      authService.login(loginRequestDTO,req,res);
-        return ResponseEntity.ok("ok");
+      AccountLoginResponseDto tokenDto = authService.login(loginRequestDTO);
+      return ResponseEntity.ok(tokenDto);
 
     }
 

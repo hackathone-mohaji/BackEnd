@@ -1,6 +1,7 @@
 package com.mohaji.hackathon.domain.wear.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mohaji.hackathon.common.security.SecurityUtil;
 import com.mohaji.hackathon.domain.Image.entity.Image;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
@@ -31,11 +32,11 @@ public class OutfitRecommendationService {
     private final ImageUtil imageUtil;
     private final CombinationRepository combinationRepository;
     private final CombinationWearRepository combinationWearRepository;
+    private final SecurityUtil securityUtil;
 
     public GPTRecommendationResponseDTO recommendOutfit() {
         // 1. 회원 정보 불러오기
-        Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
+        Account account = securityUtil.getAccount();
         // 2. 디비에서 옷 정보 불러오기
         List<Wear> userWears = wearRepository.findAllByAccountId(account.getId());
 

@@ -41,6 +41,7 @@ application-secret.yml
 application-weather.yml
 application-chatgpt.yml
 application-removebg.yml
+application-jwt.yml
 
 ### VS Code ###
 .vscode/

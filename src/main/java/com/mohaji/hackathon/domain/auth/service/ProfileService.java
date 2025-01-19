@@ -2,6 +2,7 @@ package com.mohaji.hackathon.domain.auth.service;
 
 import com.mohaji.hackathon.common.error.enums.ErrorCode;
 import com.mohaji.hackathon.common.error.exception.BusinessException;
+import com.mohaji.hackathon.common.security.SecurityUtil;
 import com.mohaji.hackathon.domain.Image.entity.Image;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.dto.ProfileResponseDTO;
@@ -21,11 +22,11 @@ public class ProfileService {
 
     private final ImageUtil imageUtil;
     private final AccountRepository accountRepository;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public void setProfile(MultipartFile profile) throws IOException {
-        Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
+        Account account = securityUtil.getAccount();
         account = accountRepository.findById(account.getId()).orElseThrow(()-> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
 
 
@@ -33,10 +34,9 @@ public class ProfileService {
     }
 
 
+
     public ProfileResponseDTO getProfile() throws IOException {
-        Account account = (Account) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        account = accountRepository.findById(account.getId()).orElseThrow(()-> new BusinessException(ErrorCode.ENTITY_NOT_FOUND));
+        Account account = securityUtil.getAccount();
         Image image = account.getImages().get(0);
         String imageUrl = imageUtil.imageUrl(image, account);
         String username = account.getUsername();

@@ -2,6 +2,7 @@ package com.mohaji.hackathon.common.error.enums;
 
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
@@ -27,6 +28,7 @@ public enum ErrorCode {
     INVALID_REQUEST(400,"C018", "잘못된 요청값입니다."),
     MULTIPART_FILE_NOT_FOUND(400,"C019","MultipartFile을 찾을 수 없습니다."),
     REQUEST_FAILED(400,"C020","요청에 실패했습니다 다시 시도해주세요"),
+    UNAUTHORIZED(400, "C021", "인증되지 않은 사용자입니다. 다시 로그인해주세요."),
 
 
 
@@ -44,7 +46,8 @@ public enum ErrorCode {
     NO_PERMISSION(401, "T002", "요청에 대한 권한이 없습니다"),
     TOKEN_ERROR(403,"T003","토큰 관련 오류입니다"),
     INVALID_JWT_TOKEN(401,"T004","잘못된 JWT 토큰입니다"),
-
+    EXPIRED_ACCESS_TOKEN(401, "T005", "만료된 엑세스 토큰"),
+    EXPIRED_REFRESH_TOKEN(401, "T006", "만료된 리프레시 토큰"),
     //Firebase Custom Token
     FAIL_TO_MAKE_FIREBASE_CUSTOM_TOKEN(401,"T004","Firebase Custom Token을 발급하는데 실패했습니다."),
 

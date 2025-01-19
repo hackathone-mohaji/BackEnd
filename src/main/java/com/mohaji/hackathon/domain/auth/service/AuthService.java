@@ -1,4 +1,6 @@
 package com.mohaji.hackathon.domain.auth.service;
+import com.mohaji.hackathon.common.security.TokenProvider;
+import com.mohaji.hackathon.domain.auth.dto.AccountLoginResponseDto;
 import com.mohaji.hackathon.domain.auth.dto.FindRequestDTO;
 import com.mohaji.hackathon.domain.auth.dto.LoginRequestDTO;
 import com.mohaji.hackathon.domain.auth.dto.SignUpRequestDTO;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,8 +37,8 @@ public class AuthService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
-    private final HttpSessionSecurityContextRepository securityContextRepository;
+    private final TokenProvider tokenProvider;
+
 
     @Transactional
     public SignUpResponseDTO signUp(SignUpRequestDTO signUpRequestDTO) {
@@ -59,18 +62,28 @@ public class AuthService {
                 .build();
     }
 
-    public void login(LoginRequestDTO loginRequestDTO, HttpServletRequest req, HttpServletResponse res) {
+    public AccountLoginResponseDto login(LoginRequestDTO loginRequestDTO) {
         try {
+
+            Account account = accountRepository.findByEmail(
+                    loginRequestDTO.getEmail())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
             UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(
                     loginRequestDTO.getEmail(),
                     loginRequestDTO.getPassword()
                 );
 
-            Authentication authentication = authenticationManager.authenticate(token);
-            SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
-            context.setAuthentication(authentication);
-            securityContextRepository.saveContext(context, req, res);
+
+            Authentication authentication = authenticationManager
+                .authenticate(token);
+
+
+            String accessToken = tokenProvider.createAccessToken(authentication);
+            String refreshToken = tokenProvider.createRefreshToken(authentication, account.getId());
+
+            return new AccountLoginResponseDto(accessToken, refreshToken);
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException("로그인 인증에 실패했습니다");
         }
@@ -98,13 +111,13 @@ public class AuthService {
         }
     }*/
 
-    @Transactional
+/*    @Transactional
     public boolean duplicateEmail(String requsetEmail) {
         Optional<Account> findEmail = accountRepository.findByEmail(requsetEmail);
 
         return findEmail.isPresent();
 
-    }
+    }*/
 
 //    @Transactional
 //    public FindEmailResponseDTO findEmail(String name, String phoneNumber) {

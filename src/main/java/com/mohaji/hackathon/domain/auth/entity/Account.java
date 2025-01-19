@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
+
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,15 +25,17 @@ public class Account implements UserDetails , ImageEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Getter
   private String email;
 
   private String password;
+
 
   private String username;
 
   public boolean swipable;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
   @JoinTable
   @Setter
   private List<Image> images;
@@ -52,4 +54,5 @@ public class Account implements UserDetails , ImageEntity {
   public boolean isAccountNonExpired() {
     return true;
   }
+
 }
