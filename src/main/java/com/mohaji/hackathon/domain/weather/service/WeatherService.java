@@ -157,6 +157,7 @@
 package com.mohaji.hackathon.domain.weather.service;
 
 import com.mohaji.hackathon.domain.weather.dto.WeatherInfoDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -170,6 +171,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
+@Slf4j
 public class WeatherService {
 
     private final RestTemplate restTemplate;
@@ -186,6 +188,7 @@ public class WeatherService {
             URI uri = new URI(buildUrl(nx, ny));
             String response = restTemplate.getForObject(uri, String.class);
 
+            log.info("weatherApiResponse : {}", response);
             JSONObject jsonObject = new JSONObject(response);
             JSONArray items = jsonObject.getJSONObject("response")
                     .getJSONObject("body")
