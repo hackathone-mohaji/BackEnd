@@ -153,7 +153,7 @@ public class OutfitRecommendationService {
         prompt.append("- Provide a detailed explanation for the recommendation in JSON format as a separate field.\n");
         prompt.append("- Please answer the reason why you chose this combination in Korean\n");
         prompt.append("- **Ensure that the JSON format is valid and properly structured.Please provide the JSON content without the enclosing json\\\\n at the beginning, \\\\n at the end, and also remove all newline characters (\\\\n) along with extra spaces and whitespace.\n");
-        prompt.append("- The output must follow this exact JSON structure, ensuring that the items are ordered as top, bottom, and outerwear (if included):\n");
+        prompt.append("- The output must follow this exact JSON structure, ensuring that the items are ordered as top, bottom, outerwear, and shoes (if included):\n");
         prompt.append("{\n");
         prompt.append("  \"outfit\": [\n");
         prompt.append("    {\"id\": [Entity ID], \"category\": \"[Category]\", \"item\": \"[Item]\", \"color\": \"[Color]\", \"print\": \"[Print]\", \"style\": \"[Style]\", \"season\": \"[Season]\"},\n");
