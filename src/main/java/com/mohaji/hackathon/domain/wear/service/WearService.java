@@ -48,37 +48,6 @@ public class WearService {
   private final OutfitRecommendationService outfitRecommendationService;
   private final SecurityUtil securityUtil;
 
-//        public Wear saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
-//        try {
-//            // 1. 이미지 누끼 땀
-////            MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
-//            // 2. gpt 한테 분석
-//            String json = gptService.analyzeImage(imageFile);
-//
-//            // 3. 분석 결과 (wear) 저장
-//            log.info("Json"+json);
-//
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            JsonNode rootNode = objectMapper.readTree(json);
-//            String content = rootNode.get("choices").get(0).get("message").get("content").asText();
-//
-//
-//            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
-//            System.out.println("wearDto = " + wearDto);
-//            Wear wear = Wear.builder()
-//                    .color(wearDto.getColor())
-//                    .category(wearDto.getCategory())
-//                    .item(wearDto.getItem())
-//                    .prints(wearDto.getPrint())
-//                    .build();
-//
-//            // 4. 이미지 저장
-//            // 이미지랑 한꺼번에 저장
-//            return wearRepository.save(wear);
-//        } catch (Exception e) {
-//            throw new RuntimeException("JSON 데이터 매핑 실패", e);
-//        }
-//    }
 
   @Transactional
   public void saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
@@ -128,7 +97,7 @@ public class WearService {
         }
         if (hasTop && hasBottom && hasOuterwear && hasShoes) {
 
-          outfitRecommendationService.recommendOutfit();
+          outfitRecommendationService.recommendOutfit(1,account.getId());
           account.swipable = true;
           accountRepository.save(account);
         }
@@ -213,6 +182,7 @@ public class WearService {
 
   }
 
+
   @Transactional
   public SwipeDto swipe() {
     //로그인된 계정조회
@@ -268,10 +238,7 @@ public class WearService {
     // b-a 가 음수라면 gpt api를 통해 새로운 옷 조합 10개 생성 후 저장
     if (difference < 0) {
 
-      for (int i = 0; i < 10; i++) {
-        outfitRecommendationService.recommendOutfit();
-
-      }
+        outfitRecommendationService.recommendOutfit(10,account.getId());
 
     }
 

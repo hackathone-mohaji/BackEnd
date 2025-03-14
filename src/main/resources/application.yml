@@ -20,6 +20,14 @@ spring:
     redis:
       host: localhost
       port: 6379
+  datasource:
+    hikari:
+      maximum-pool-size: 60  # 기존 10에서 60으로 증가
+      minimum-idle: 10        # 최소 유휴 커넥션을 5로 설정
+      idle-timeout: 30000     # 유휴 커넥션 30초 후 해제
+      max-lifetime: 1800000   # 커넥션 최대 수명 30분
+      connection-timeout: 30000  # 30초 동안 연결되지 않으면 타임아웃
+
 image:
   allowed-extensions: jpg,png
   max-file-size: 104857600 # 100MB in bytes
@@ -29,3 +37,9 @@ image:
 springdoc:
   swagger-ui:
     path: /swagger
+
+async:
+  core-pool-size: 10  # 기본 쓰레드 개수
+  max-pool-size: 50   # 최대 쓰레드 개수
+  queue-capacity: 100 # 큐 크기
+

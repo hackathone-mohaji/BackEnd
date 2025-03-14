@@ -47,7 +47,7 @@ public class GPTRecommendationResponseDTO {
         private Print print;
 
         @JsonProperty("style") // JSON 키 "style"와 매핑
-        private Style style;
+        private String style;
 
         @JsonProperty("season") // JSON 키 "season"와 매핑
         private Weather season;

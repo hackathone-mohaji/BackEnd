@@ -71,7 +71,6 @@ public class GPTService {
                     .get("message")
                     .get("content")
                     .asText();
-            log.info("Extracted content: {}", content);
 
             return content;
 
@@ -135,7 +134,6 @@ public class GPTService {
         try {
             // 1. 원본 응답을 JsonNode로 파싱
             JsonNode rootNode = objectMapper.readTree(response.toString());
-            log.info("RootNode: {}", rootNode.toString());
 
             // 2. content 값 추출
             String content = rootNode
@@ -144,7 +142,6 @@ public class GPTService {
                     .get("message")
                     .get("content")
                     .asText();
-            log.info("Extracted content: {}", content);
 
             // 3. content 값을 JSON으로 바로 파싱하여 DTO로 매핑
             WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);

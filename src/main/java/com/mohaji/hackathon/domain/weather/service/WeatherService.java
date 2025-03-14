@@ -188,7 +188,6 @@ public class WeatherService {
             URI uri = new URI(buildUrl(nx, ny));
             String response = restTemplate.getForObject(uri, String.class);
 
-            log.info("weatherApiResponse : {}", response);
             JSONObject jsonObject = new JSONObject(response);
             JSONArray items = jsonObject.getJSONObject("response")
                     .getJSONObject("body")
