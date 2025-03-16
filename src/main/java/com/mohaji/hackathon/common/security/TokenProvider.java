@@ -16,6 +16,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class TokenProvider implements InitializingBean {
   private static final String AUTHORITIES_KEY = "auth";
 
 
-  @Value("${jwt.secret}")
+  @Value("${spring.jwt.secret-key}")
   private String secret;
   @Value("${jwt.access-token-validity-in-seconds}")
   private long AccessTokenValidityInMilliSeconds;
@@ -85,9 +86,10 @@ public class TokenProvider implements InitializingBean {
         .map(GrantedAuthority::getAuthority)
         .collect(Collectors.joining(","));
 
+    String subject = authentication.getName();  // ✅ 여기 수정 (principal 직접 사용 안하고 getName으로 이메일 얻기)
 
     return Jwts.builder()
-        .setSubject(((Account)authentication.getPrincipal()).getEmail())
+        .setSubject(subject)
         .claim(AUTHORITIES_KEY, authorities)
         .signWith(key, SignatureAlgorithm.HS256)
         .setExpiration(validity)
@@ -136,5 +138,22 @@ public class TokenProvider implements InitializingBean {
 
     }
     return false;
+  }
+
+
+  public  String reissueToken(Authentication authentication, Long accountId, String refreshToken) {
+    // Refresh Token 검증
+    if (!validateToken(refreshToken)) {
+      throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
+    }
+
+    // Redis에 저장된 Refresh Token과 비교 검증
+    String storedRefreshToken = redisTemplate.opsForValue().get(accountId.toString());
+    if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+      throw new BusinessException(ErrorCode.INVALID_JWT_TOKEN);
+    }
+
+    // 새 액세스 토큰 발급
+    return createAccessToken(authentication);
   }
 }

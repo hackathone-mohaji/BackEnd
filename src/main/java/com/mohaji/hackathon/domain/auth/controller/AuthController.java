@@ -3,12 +3,9 @@ package com.mohaji.hackathon.domain.auth.controller;
 
 
 import com.mohaji.hackathon.common.security.CustomUserDetailService;
-import com.mohaji.hackathon.domain.auth.dto.AccountLoginResponseDto;
+import com.mohaji.hackathon.domain.auth.dto.*;
 import com.mohaji.hackathon.domain.auth.service.AuthService;
 import com.mohaji.hackathon.common.error.exception.ErrorResponse;
-import com.mohaji.hackathon.domain.auth.dto.LoginRequestDTO;
-import com.mohaji.hackathon.domain.auth.dto.SignUpRequestDTO;
-import com.mohaji.hackathon.domain.auth.dto.SignUpResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,6 +56,15 @@ public class AuthController {
 
     }
 
+    @PatchMapping("/tokens")
+    @Operation(summary = "토큰 재발급", description = "Access Token과 남은 기간에 따라 Refresh Token을 재발급 합니다.",
+            responses = {})
+    public ResponseEntity<GeneratedTokenDTO> tokenModify(@Valid @RequestBody TokenModifyDTO tokenModifyRequest) {
+
+        String accessToken = authService.reissueToken(tokenModifyRequest.getRefreshToken());
+        GeneratedTokenDTO generatedTokenDTO = new GeneratedTokenDTO(accessToken);
+        return ResponseEntity.ok(generatedTokenDTO);
+    }
 
 
 //    @PostMapping("/duplicate/email")
@@ -124,25 +130,16 @@ public class AuthController {
 //                        .build());
 //    }
 
-//    @PatchMapping("/tokens")
-//    @Operation(summary = "토큰 재발급", description = "Access Token과 남은 기간에 따라 Refresh Token을 재발급 합니다.",
-//            responses = {
-//                    @ApiResponse(responseCode = "200", description = "성공"),
-//                    @ApiResponse(responseCode = "400", description = "존재하지 않는 회원입니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-//                    @ApiResponse(responseCode = "400", description = "유효하지 않은 리프레쉬 토큰입니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-//            })
-//    public GeneratedTokenDTO tokenModify(@Valid @RequestBody TokenModifyDTO tokenModifyRequest) {
-//        return jwtProvider.reissueToken(tokenModifyRequest.getRefreshToken());
-//    }
 
-//    @PatchMapping("/logout")
-//    @Operation(summary = "로그아웃", description = "refresh token을 비웁니다. 프론트측에서도 access token을 처리해주세요.")
-//    public ResponseEntity<Void> logout() {
-//        authService.logout();
-//        return ResponseEntity.status(HttpStatus.OK).build();
-//    }
-//
-//
+/*
+    @PatchMapping("/logout")
+    @Operation(summary = "로그아웃", description = "refresh token을 비웁니다. 프론트측에서도 access token을 처리해주세요.")
+    public ResponseEntity<Void> logout() {
+        authService.logout();
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }*/
+
+
 
 
 }

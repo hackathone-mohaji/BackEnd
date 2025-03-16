@@ -88,28 +88,21 @@ public class AuthService {
             throw new BadCredentialsException("로그인 인증에 실패했습니다");
         }
     }
- /*   @Transactional
-    public void login(LoginRequestDTO loginRequestDTO) {
-        Optional<Account> findEmail = accountRepository.findByEmail(loginRequestDTO.getEmail());
-
-        if (findEmail.isPresent()) {
-            Account account = findEmail.get();
-            if (passwordEncoder.matches(loginRequestDTO.getPassword(), account.getPassword())) {
-                SecurityMemberDTO securityMemberDTO = SecurityMemberDTO.builder()
-                        .id(account.getId())
-                        .email(account.getEmail())
-                        .username(account.getUsername())
-                        .build();
 
 
-            } else {
-                throw new BusinessException(ErrorCode.INVALID_PASSWORD);
-            }
 
-        } else {
-            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
-        }
-    }*/
+    public String reissueToken(String refreshToken) {
+        // Authentication 객체 추출
+        Authentication authentication = TokenProvider.getAuthentication(refreshToken);
+        String email = authentication.getName();
+
+        // 계정 조회
+        Account account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return tokenProvider.reissueToken(authentication,account.getId(), refreshToken);
+    }
+
 
 /*    @Transactional
     public boolean duplicateEmail(String requsetEmail) {
@@ -135,6 +128,7 @@ public class AuthService {
 //
 //    }
 
+/*
     @Transactional
     public void resetPassword(FindRequestDTO.ResetPassword passwordRequestDTO) {
         Optional<Account> findEmail = accountRepository.findByEmail(passwordRequestDTO.getEmail());
@@ -148,6 +142,7 @@ public class AuthService {
             throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
         }
     }
+*/
 
 
 //    @Transactional
