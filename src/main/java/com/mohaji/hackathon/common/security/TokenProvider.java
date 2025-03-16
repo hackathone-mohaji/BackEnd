@@ -30,6 +30,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -86,10 +87,19 @@ public class TokenProvider implements InitializingBean {
         .map(GrantedAuthority::getAuthority)
         .collect(Collectors.joining(","));
 
-    String subject = authentication.getName();  // ✅ 여기 수정 (principal 직접 사용 안하고 getName으로 이메일 얻기)
+
+    String email;
+
+    if (authentication.getPrincipal() instanceof Account account) {
+      email = account.getEmail();
+    } else if (authentication.getPrincipal() instanceof UserDetails userDetails) {
+      email = userDetails.getUsername();
+    } else {
+      email = authentication.getName();
+    }
 
     return Jwts.builder()
-        .setSubject(subject)
+        .setSubject(email)
         .claim(AUTHORITIES_KEY, authorities)
         .signWith(key, SignatureAlgorithm.HS256)
         .setExpiration(validity)
