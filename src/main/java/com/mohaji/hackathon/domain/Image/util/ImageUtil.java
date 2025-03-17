@@ -66,7 +66,7 @@ public  class ImageUtil {
     // 이미지 조회 url 만들어서 반환하는 메서드
     // todo: 이미지는 항상 리스트임으로 삭제된 항목 제거후 조회하는 매서드 만들고 나서 리스트로 반환
     // fixme:  parentId와 filename이 같다면 잘못된 이미지 조회가 일어날 수 있다.// 이미지를 저장할때 parentId를 암호화 한다면 보안 + 이 문제가 해결된다
-    public  <T extends ImageEntity> String imageUrl(Image image, T entity) {
+    public static <T extends ImageEntity> String imageUrl(Image image, T entity) {
         String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         String extension = StringUtils.getFilenameExtension(image.getOriginalFileName());
         String hashedFilename = hashFileName(
@@ -157,7 +157,7 @@ public  class ImageUtil {
     }
 
     // 해싱 메서드 (SHA-256 기반)
-    private  String hashFileName(String input) {
+    private static String hashFileName(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));

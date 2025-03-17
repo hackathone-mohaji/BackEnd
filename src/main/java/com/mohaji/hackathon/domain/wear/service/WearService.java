@@ -182,6 +182,10 @@ public class WearService {
 
   }
 
+  public Wear getWearInfo(Long wearId) {
+    return wearRepository.findById(wearId).orElseThrow(()->new BusinessException(ErrorCode.WEAR_NULL));
+  }
+
 
   @Transactional
   public SwipeDto swipe() {

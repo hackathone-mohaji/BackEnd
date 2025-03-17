@@ -3,10 +3,11 @@ package com.mohaji.hackathon.domain.wear.controller;
 
 import com.mohaji.hackathon.common.error.enums.ErrorCode;
 import com.mohaji.hackathon.common.error.exception.BusinessException;
-import com.mohaji.hackathon.domain.wear.dto.GPTRecommendationResponseDTO;
 import com.mohaji.hackathon.domain.wear.dto.SwipeDto;
-import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto.WearResponseDto;
+import com.mohaji.hackathon.domain.wear.dto.WearListResponseDto;
+import com.mohaji.hackathon.domain.wear.dto.WearResponseDto;
 import com.mohaji.hackathon.domain.wear.entity.Combination;
+import com.mohaji.hackathon.domain.wear.entity.Wear;
 import com.mohaji.hackathon.domain.wear.service.BookmarkService;
 import com.mohaji.hackathon.domain.wear.service.OutfitRecommendationService;
 import com.mohaji.hackathon.domain.wear.service.TenService;
@@ -33,9 +34,8 @@ import java.io.IOException;
 public class WearController {
 
   private final WearService wearService;
-  private final OutfitRecommendationService outfitRecommendationService;
   private final BookmarkService bookmarkService;
-  private final TenService tenService;
+
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "개별 옷 이미지 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
@@ -54,13 +54,28 @@ public class WearController {
   @GetMapping
   @Secured("ROLE_USER")
   @Operation(summary = "로그인한 사용자의 이미지를 반환함, 쿼리 파라미터로 category를 넘기면 필터링됨")
-  public ResponseEntity<List<WearResponseDto>> listWearImage(
+  public ResponseEntity<WearListResponseDto> listWearImage(
       @RequestParam(required = false) String category) {
 
-    List<WearResponseDto> wearResponseDtos = wearService.listWearImage(category);
+    List<WearListResponseDto.WearResponseDto> wearResponseDtos = wearService.listWearImage(category);
+    WearListResponseDto wearListResponseDto = new WearListResponseDto(wearResponseDtos);
 
-    return ResponseEntity.ok(wearResponseDtos);
+    return ResponseEntity.ok(wearListResponseDto);
   }
+
+
+  @GetMapping("/{wearId}")
+  @Secured("ROLE_USER")
+  @Operation(summary = "옷 개별 조회")
+  public ResponseEntity<WearResponseDto> getWearInfo(@RequestParam Long wearId) {
+
+    Wear wear =  wearService.getWearInfo(wearId);
+    WearResponseDto wearResponseDto = new WearResponseDto(wear);
+
+    return ResponseEntity.ok(wearResponseDto);
+
+  }
+
 
   @PatchMapping
   @Secured("ROLE_USER")
