@@ -80,11 +80,11 @@ public class OutfitRecommendationService {
     prompt.append("\n2. Weather information:\n");
     try {
       double temperature = parseTemperature(weatherInfo.getTemperature());
+      if (temperature != -999){
       prompt.append(String.format("- Temperature: %.1f°C\n", temperature));
-      prompt.append(String.format("- Season: %s\n", determineSeason(temperature)));
-    } catch (NumberFormatException e) {
-      throw new IllegalArgumentException(
-          "Invalid temperature format: " + weatherInfo.getTemperature(), e);
+      prompt.append(String.format("- Season: %s\n", determineSeason(temperature)));}
+    } catch (Exception e) {
+      log.error("Invalid temperature format: {}. Skipping weather and season.", weatherInfo.getTemperature(), e);
     }
     prompt.append(String.format("- Precipitation: %s\n", weatherInfo.getPrecipitation()));
     prompt.append(String.format("- Sky condition: %s\n", weatherInfo.getSkyCondition()));

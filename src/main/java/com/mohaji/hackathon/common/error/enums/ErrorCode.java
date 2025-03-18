@@ -93,9 +93,12 @@ public enum ErrorCode {
     WRONG_IMAGE(400,"WI001","잘못된 이미지를 입력했습니다. 올바른 이미지를 입력해주세요"),
 
     //FCM 관련
-    FAIL_TO_SEND_PUSH_NOTIFICATION(400,"F001","푸시알림 전송 요청을 실패했습니다");
+    FAIL_TO_SEND_PUSH_NOTIFICATION(400,"F001","푸시알림 전송 요청을 실패했습니다"),
 
-
+    // ✅ 날씨 API 관련 오류 추가
+    INVALID_WEATHER_RESPONSE(400, "WI002", "날씨 API 응답이 올바르지 않습니다"),
+    JSON_PARSE_ERROR(500, "WI003", "날씨 정보 JSON 파싱 중 오류 발생"),
+    WEATHER_API_ERROR(500, "WI004", "날씨 정보를 가져오는 중 예기치 않은 오류 발생");
 
     private final String code;
     private final String message;
