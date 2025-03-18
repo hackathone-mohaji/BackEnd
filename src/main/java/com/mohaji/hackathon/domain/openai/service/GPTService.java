@@ -11,6 +11,8 @@ import com.mohaji.hackathon.domain.wear.enums.Att.Category;
 import com.mohaji.hackathon.domain.wear.enums.Att.Color;
 import com.mohaji.hackathon.domain.wear.enums.Att.Item;
 import com.mohaji.hackathon.domain.wear.enums.Att.Print;
+import java.util.ArrayList;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -79,47 +81,48 @@ public class GPTService {
         }
     }
 
-    public static String generatePrompt() {
+    public static String generatePrompt(int imageCount) {
         String categories = Category.toFormattedString();
         String colors = Color.toFormattedString();
         String items = Item.toFormattedString();
         String prints = Print.toFormattedString();
-        // Prompt 생성
-        return "Based on the provided image, please determine the values corresponding to each category and organize them into a JSON format. " +
-                "**Ensure that the JSON format is valid and properly structured.Please provide the JSON content without the enclosing json\\\\n at the beginning, \\\\n at the end, and also remove all newline characters (\\\\n) along with extra spaces and whitespace.** The results should be written according to the following categories: \n\n" +
-                "1. **Category**: \n" + categories + "\n\n" +
-                "2. **Color**: \n" + colors + "\n\n" +
-                "3. **Item**: \n" + items + "\n\n" +
-                "4. **Print**: \n" + prints + "\n";
+
+        return String.format(
+            "Based on the %d provided images, please determine the values corresponding to each category and organize them into a JSON format. " +
+                "**Ensure that the JSON format is valid and properly structured. Provide the JSON content without the enclosing json, " +
+                "without newline characters (\\n), and also remove all extra spaces and whitespace.** " +
+                "The results should be structured as an array with %d objects, each containing the following fields:\n\n" +
+                "1. **Category**: \n%s\n\n" +
+                "2. **Color**: \n%s\n\n" +
+                "3. **Item**: \n%s\n\n" +
+                "4. **Print**: \n%s\n",
+            imageCount, imageCount, categories, colors, items, prints
+        );
     }
 
+    public List<ResponseWear> analyzeImages(List<MultipartFile> images) throws IOException {
+        if (images == null || images.isEmpty()) {
+            throw new IllegalArgumentException("No images provided");
+        }
 
-    public WearDTO analyzeImage(MultipartFile image) throws IOException {
-        String prompt = generatePrompt();
-        // 프롬프트 및 요청 구성은 기존 코드 유지
-//        String prompt = "Based on the provided image, please determine the values corresponding to each category and organize them into a JSON format. **Ensure that the JSON format is valid and properly structured.Please provide the JSON content without the enclosing json\\n at the beginning, \\n at the end, and also remove all newline characters (\\n) along with extra spaces and whitespace. The results should be written according to the following categories: \n" +
-//                "\n" +
-//                "1. **Category **:  \n" +
-//                "TOP, COAT, JACKET, PANTS, SKIRT, DRESS, JUMPER, JUMPSUIT\n" +
-//                "\n" +
-//                "2. **Color **:  \n" +
-//                "BURGUNDY, CAMEL, NAVY, BROWN, GRAY, DEEP_TONE, BLUE, WHITE, SKY_BLUE, MONOTONE, PURPLE, BEIGE, PINK, CREAM, SILVER, GOLD, BLACK, KHAKI, GREEN, DARK_TONE, GRAYISH_TONE, YELLOW, VIVID_TONE, ORANGE, RED, WINE\n" +
-//                "\n" +
-//                "3. **Item **:  \n" +
-//                "CHANEL_JACKET, TRENCH_COAT, SHIRT, OVERSIZED_T_SHIRT, SHIRT_DRESS, CARDIGAN, BLAZER, POLO_SHIRT, CABLE_KNIT, V_NECK_SWEATER, DUFFLE_COAT, TENNIS_SKIRT, CHESTERFIELD_COAT, BOX_COAT, VEST, SLACKS, PINTUCK_PANTS, LOOSE_FIT_PANTS, STRAIGHT_PANTS, SKINNY_PANTS, CARGO_PANTS, MILITARY_JACKET, T_SHIRT, JEANS, HOODIE, OVERALLS, LONG_DRESS, LONG_SKIRT, ASYMMETRIC_DRESS, BLOUSE, LOOSE_FIT_BLOUSE, FLARE_SKIRT, MERMAID_DRESS, H_LINE_SKIRT, PENCIL_SKIRT, DRAPE_DRESS, TIGHT_DRESS, DRAPE_JACKET, PONCHO, ROBE, CAPE, STAND_COLLAR_JACKET, CHINA_COLLAR_JACKET, OVERSIZED_JACKET, NO_COLLAR_JACKET, LEATHER_JACKET, HAREM_PANTS, CHEMISE_DRESS, SLEEVELESS\n" +
-//                "\n" +
-//                "4. **Print **:  \n" +
-//                "CHECK, HERRINGBONE, STRIPE, SOLID, HOUNDSTOOTH, GEOMETRIC, ANIMAL, FLORAL, TIE_DYE, LEOPARD, ZEBRA, OP_ART, CAMOUFLAGE, ABSTRACT, CUBISM`\n";
-        byte[] fileBytes = image.getBytes();
-        String base64Image = Base64.getEncoder().encodeToString(fileBytes);
-        String dataUriImage = "data:image/jpeg;base64," + base64Image;
+        String prompt = generatePrompt(images.size());
+
+        List<Map<String, Object>> contentList = new ArrayList<>();
+        contentList.add(Map.of("type", "text", "text", prompt));
+
+        List<MultipartFile> imageList = new ArrayList<>(images); // ✅ 원본 이미지 리스트 저장
+
+        for (MultipartFile image : images) {
+            byte[] fileBytes = image.getBytes();
+            String base64Image = Base64.getEncoder().encodeToString(fileBytes);
+            String dataUriImage = "data:image/jpeg;base64," + base64Image;
+
+            contentList.add(Map.of("type", "image_url", "image_url", Map.of("url", dataUriImage)));
+        }
 
         Map<String, Object> userMessage = new HashMap<>();
         userMessage.put("role", "user");
-        userMessage.put("content", List.of(
-                Map.of("type", "text", "text", prompt),
-                Map.of("type", "image_url", "image_url", Map.of("url", dataUriImage))
-        ));
+        userMessage.put("content", contentList);
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", gptConfig.getModel());
@@ -127,29 +130,43 @@ public class GPTService {
 
         // 1. REST API 요청 전송
         String response = restClient.post()
-                .body(requestBody)
-                .retrieve()
-                .body(String.class);
+            .body(requestBody)
+            .retrieve()
+            .body(String.class);
 
         try {
             // 1. 원본 응답을 JsonNode로 파싱
-            JsonNode rootNode = objectMapper.readTree(response.toString());
+            JsonNode rootNode = objectMapper.readTree(response);
 
             // 2. content 값 추출
             String content = rootNode
-                    .get("choices")
-                    .get(0)
-                    .get("message")
-                    .get("content")
-                    .asText();
+                .get("choices")
+                .get(0)
+                .get("message")
+                .get("content")
+                .asText();
 
-            // 3. content 값을 JSON으로 바로 파싱하여 DTO로 매핑
-            WearDTO wearDto = objectMapper.readValue(content, WearDTO.class);
-            log.info("Mapped WearDTO: {}", wearDto);
+            // 3. JSON 배열로 변환하여 리스트로 매핑
+            List<WearDTO> wearDtoList = Arrays.asList(objectMapper.readValue(content, WearDTO[].class));
 
-            return wearDto;
+            if (wearDtoList.size() != images.size()) {
+                throw new BusinessException(ErrorCode.WRONG_IMAGE);
+            }
+
+            // ✅ 원본 이미지와 WearDTO를 함께 반환
+            List<ResponseWear> responses = new ArrayList<>();
+            for (int i = 0; i < images.size(); i++) {
+                responses.add(new ResponseWear(wearDtoList.get(i), imageList.get(i)));
+            }
+
+            log.info("Mapped WearDTO List: {}", responses);
+            return responses;
         } catch (JsonParseException e) {
             throw new BusinessException(ErrorCode.WRONG_IMAGE);
         }
     }
+
+
+    public record ResponseWear (WearDTO wearDTO, MultipartFile multipartFile){}
 }
+

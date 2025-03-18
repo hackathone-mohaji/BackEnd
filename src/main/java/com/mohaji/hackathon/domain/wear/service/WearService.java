@@ -8,6 +8,7 @@ import com.mohaji.hackathon.domain.Image.util.ClippingBgUtil;
 import com.mohaji.hackathon.domain.Image.util.ImageUtil;
 import com.mohaji.hackathon.domain.auth.entity.Account;
 import com.mohaji.hackathon.domain.auth.repository.AccountRepository;
+import com.mohaji.hackathon.domain.openai.service.GPTService.ResponseWear;
 import com.mohaji.hackathon.domain.wear.dto.SwipeDto;
 import com.mohaji.hackathon.domain.wear.dto.SwipeDto.wearDto;
 import com.mohaji.hackathon.domain.wear.dto.WearDTO;
@@ -50,60 +51,67 @@ public class WearService {
 
 
   @Transactional
-  public void saveImageAndAnalyzeDate(MultipartFile imageFile) throws IOException {
+  public void saveImageAndAnalyzeDate(List<MultipartFile> files) throws IOException {
     try {
       Account account = securityUtil.getAccount();
-
-      //todo 이미지 누끼 주석 풀기
       // 1. 이미지 누끼 땀
-      MultipartFile removeBackground = clippingBgUtil.removeBackground(imageFile);
+      //todo api 반복요청 제거 후 누끼제거 오픈소스 적용
+      List<MultipartFile> removeBackground = files.stream().map(clippingBgUtil::removeBackground).toList();
+
       // 2. GPT에서 분석 결과 받기
-      WearDTO wearDto = gptService.analyzeImage(removeBackground);
-      log.info("Mapped WearDTO: {}", wearDto);
+      List<ResponseWear> responseWears = gptService.analyzeImages(removeBackground);
+      log.info("Mapped WearDTO: {}", responseWears);
 
-      // 3. Wear 엔티티 생성
-      Wear wear = Wear.builder()
-          .account(account)
-          .color(wearDto.getColor())
-          .category(wearDto.getCategory())
-          .item(wearDto.getItem())
-          .prints(wearDto.getPrint())
-          .build();
+      responseWears.forEach(record -> {
+            Wear wear = Wear.builder()
+                .account(account)
+                .color(record.wearDTO().getColor())
+                .category(record.wearDTO().getCategory())
+                .item(record.wearDTO().getItem())
+                .prints(record.wearDTO().getPrint())
+                .build();
 
-      // 4. Wear 엔티티 저장 및 반환
-      wearRepository.save(wear);
+            // 4. Wear 엔티티 저장 및 반환
+            wearRepository.save(wear);
 
-      // 5. 이미지 저장
-      imageUtil.addImage(wear, removeBackground);
+            // 5. 이미지 저장
+        try {
+          imageUtil.addImage(wear, record.multipartFile());
+        } catch (IOException e) {
+          throw new RuntimeException("이미지 저장 실패",e);
+        }
 
-      if (!account.swipable) {
-        boolean hasTop = false;
-        boolean hasBottom = false;
-        boolean hasOuterwear = false;
-        boolean hasShoes = false;
+        // 3. Wear 엔티티 생성
 
-        List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
-        wears.add(wear);
-        for (Wear checkWear : wears) {
-          if (checkWear.getCategory().equals(Category.TOP)) {
-            hasTop = true;
-          } else if (checkWear.getCategory().equals(Category.BOTTOM)) {
-            hasBottom = true;
-          } else if (checkWear.getCategory().equals(Category.OUTERWEAR)) {
-            hasOuterwear = true;
-          } else if (checkWear.getCategory().equals(Category.SHOES)) {
-            hasShoes = true;
+            if (!account.swipable) {
+              boolean hasTop = false;
+              boolean hasBottom = false;
+              boolean hasOuterwear = false;
+              boolean hasShoes = false;
+
+              List<Wear> wears = wearRepository.findAllByAccountId(account.getId());
+              wears.add(wear);
+              for (Wear checkWear : wears) {
+                if (checkWear.getCategory().equals(Category.TOP)) {
+                  hasTop = true;
+                } else if (checkWear.getCategory().equals(Category.BOTTOM)) {
+                  hasBottom = true;
+                } else if (checkWear.getCategory().equals(Category.OUTERWEAR)) {
+                  hasOuterwear = true;
+                } else if (checkWear.getCategory().equals(Category.SHOES)) {
+                  hasShoes = true;
+                }
+              }
+              if (hasTop && hasBottom && hasOuterwear && hasShoes) {
+
+                outfitRecommendationService.recommendOutfit(1, account.getId());
+                account.swipable = true;
+                accountRepository.save(account);
+              }
+            }
+
           }
-        }
-        if (hasTop && hasBottom && hasOuterwear && hasShoes) {
-
-          outfitRecommendationService.recommendOutfit(1,account.getId());
-          account.swipable = true;
-          accountRepository.save(account);
-        }
-      }
-
-
+      );
     } catch (Exception e) {
       log.error("Error while mapping JSON to WearDTO", e);
       throw new RuntimeException("JSON 데이터 매핑 실패", e);
@@ -183,7 +191,8 @@ public class WearService {
   }
 
   public Wear getWearInfo(Long wearId) {
-    return wearRepository.findById(wearId).orElseThrow(()->new BusinessException(ErrorCode.WEAR_NULL));
+    return wearRepository.findById(wearId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.WEAR_NULL));
   }
 
 
@@ -242,7 +251,7 @@ public class WearService {
     // b-a 가 음수라면 gpt api를 통해 새로운 옷 조합 10개 생성 후 저장
     if (difference < 0) {
 
-        outfitRecommendationService.recommendOutfit(10,account.getId());
+      outfitRecommendationService.recommendOutfit(10, account.getId());
 
     }
 

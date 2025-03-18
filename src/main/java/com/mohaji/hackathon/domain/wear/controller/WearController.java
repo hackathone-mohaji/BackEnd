@@ -38,10 +38,10 @@ public class WearController {
 
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Operation(summary = "개별 옷 이미지 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
+  @Operation(summary = "이미지  리스트 저장, MULTIPART_FORM_DATA로 이미지 보내면 누끼 따서 분석하고 저장함")
   @Secured("ROLE_USER")
-  public void createWear(@RequestPart MultipartFile file) throws IOException {
-    wearService.saveImageAndAnalyzeDate(file);
+  public void createWear(@RequestPart List<MultipartFile> files) throws IOException {
+    wearService.saveImageAndAnalyzeDate(files);
   }
 
   @DeleteMapping("/{wearId}")
