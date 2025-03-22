@@ -47,7 +47,7 @@ public class WearController {
   @DeleteMapping("/{wearId}")
   @Secured("ROLE_USER")
   @Operation(summary = "리스트 조회할때 반환받은 wearId를 \\/ 와 같이 뒤에 붙여서 보내면 해당 옷이 삭제 됨")
-  public void deleteWear(@RequestParam Long wearId) {
+  public void deleteWear(@PathVariable Long wearId) {
     wearService.deleteWear(wearId);
   }
 
